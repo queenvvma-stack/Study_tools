@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Generator | StudyTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #4A148C, #880E4F);
+    color: white;
+  }
+
+  header {
+    text-align: center;
+    padding: 50px 20px 20px;
+  }
+
+  header h1 {
+    font-size: 42px;
+    font-weight: 700;
+  }
+
+  header p {
+    font-size: 18px;
+    opacity: 0.9;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.12);
+    padding: 30px;
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  input, button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+  }
+
+  input { outline: none; }
+
+  button {
+    background: white;
+    color: #4A148C;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover { background: #f3f3f3; }
+
+  .output {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.25);
+    color: #4A148C;
+    font-weight: 600;
+    font-size: 16px;
+    white-space: pre-line;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Question Generator</h1>
+  <p>Create instant study questions based on any topic!</p>
+</header>
+
+<div class="container">
+
+  <input id="topicInput" placeholder="Enter a topic, for example: Photosynthesis">
+  <button onclick="generateQuestions()">Generate Questions</button>
+
+  <div class="output" id="outputBox">Your generated questions will appear here...</div>
+
+</div>
+
+<script>
+  function generateQuestions() {
+    const topic = document.getElementById("topicInput").value.trim();
+    const outputBox = document.getElementById("outputBox");
+
+    if (topic === "") {
+      outputBox.innerText = "⚠️ Please enter a topic!";
+      return;
+    }
+
+    const questions = [
+      `1. What is ${topic} and why is it important?`,
+      `2. How does ${topic} work step by step?`,
+      `3. What are the main components involved in ${topic}?`,
+      `4. How is ${topic} used in real life?`,
+      `5. What are the advantages and disadvantages of ${topic}?`,
+      `6. Who discovered or developed the concept of ${topic}?`,
+      `7. What common mistakes do people make while understanding ${topic}?`,
+      `8. How does ${topic} compare with similar concepts?`,
+      `9. What are the future possibilities related to ${topic}?`,
+      `10. Explain ${topic} in your own words.`
+    ];
+
+    outputBox.innerText = questions.join("\n");
+  }
+</script>
+
+</body>
+</html>
