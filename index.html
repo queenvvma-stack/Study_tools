@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StudyTools | Free Student Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #4a6cf7, #6fb1fc);
+    color: white;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 700;
+  }
+
+  header p {
+    margin-top: 8px;
+    font-size: 18px;
+    opacity: 0.9;
+  }
+
+  .tools-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+  }
+
+  .tool-card {
+    background: white;
+    color: #1b3c73;
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+  }
+
+  .tool-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+  }
+
+  .tool-card p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  @keyframes fadeIn {
+    from {opacity:0; transform:translateY(-20px);}
+    to {opacity:1; transform:translateY(0);}
+  }
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>StudyTools</h1>
+  <p>Smart Tools Made for Students</p>
+</header>
+
+<div class="tools-container">
+  <a href="summarizer.html" class="tool-card">
+    <h3>Study Notes Summarizer</h3>
+    <p>Paste your notes and get a short summary instantly.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Word Counter & Reading Time</h3>
+    <p>Check words, characters, and reading time for any text.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Essay Title Generator</h3>
+    <p>Generate creative essay titles in seconds.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Question Generator</h3>
+    <p>Get 5 questions from any topic.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Flashcard Maker</h3>
+    <p>Create study flashcards from your notes.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>PDF to Text</h3>
+    <p>Extract text from any PDF file easily.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Paraphrasing Tool</h3>
+    <p>Rewrite sentences with simple synonyms.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Study Timer (Pomodoro)</h3>
+    <p>Focus sessions with reminders for breaks.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>Notes Cleaner</h3>
+    <p>Remove line breaks and fix spacing in your notes.</p>
+  </a>
+
+  <a href="#" class="tool-card">
+    <h3>English ↔ Urdu Translator</h3>
+    <p>Quick translation between English and Urdu.</p>
+  </a>
+</div>
+
+<footer>
+  Made with ❤️ by You
+</footer>
+
+</body>
+</html>
 
