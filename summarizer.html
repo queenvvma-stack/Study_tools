@@ -1,1 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Notes Summarizer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1b3c73, #5b9bd5);
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      margin: 40px auto;
+      background: rgba(255,255,255,0.15);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      border: none;
+      outline: none;
+      border-radius: 15px;
+      padding: 15px;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 15px;
+      background: white;
+      color: #1b3c73;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    .output {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.25);
+      min-height: 120px;
+      font-size: 16px;
+      white-space: pre-wrap;
+    }
+
+    a {
+      color: white;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Study Notes Summarizer
+</header>
+
+<div class="container">
+
+  <p><a href="index.html">⬅ Back to Home</a></p>
+
+  <h2>Paste your study notes:</h2>
+
+  <textarea id="inputText" placeholder="Paste long notes here..."></textarea>
+
+  <button onclick="summarize()">Summarize Notes</button>
+
+  <div class="output" id="outputBox">Your summary will appear here...</div>
+
+</div>
+
+<script>
+  function summarize() {
+    let text = document.getElementById("inputText").value;
+
+    if (text.trim() === "") {
+      return document.getElementById("outputBox").innerText =
+        "⚠️ Please paste some text first!";
+    }
+
+    // Simple summarization logic (no backend needed)
+    let sentences = text.split(".");
+    let summary = sentences.slice(0, 3).join(".") + ".";
+
+    document.getElementById("outputBox").innerText = summary;
+  }
+</script>
+
+</body>
+</html>
 
