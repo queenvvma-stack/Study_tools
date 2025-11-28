@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Essay Title Generator | StudyTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1b3c73, #5b9bd5);
+    color: white;
+  }
+
+  header {
+    text-align: center;
+    padding: 50px 20px 20px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 700;
+  }
+
+  header p {
+    margin-top: 8px;
+    font-size: 18px;
+    opacity: 0.9;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.15);
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  input, button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 15px;
+    border: none;
+    font-size: 16px;
+  }
+
+  input {
+    outline: none;
+  }
+
+  button {
+    background: white;
+    color: #1b3c73;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #f0f0f0;
+  }
+
+  .output {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.25);
+    color: #1b3c73;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  a {
+    display: inline-block;
+    margin-bottom: 15px;
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Essay Title Generator</h1>
+  <p>Generate creative essay titles instantly!</p>
+</header>
+
+<div class="container">
+
+  <a href="index.html">⬅ Back to Home</a>
+
+  <input type="text" id="topicInput" placeholder="Enter your essay topic here...">
+  <button onclick="generateTitle()">Generate Titles</button>
+
+  <div class="output" id="outputBox">Your generated titles will appear here...</div>
+
+</div>
+
+<script>
+  function generateTitle() {
+    const topic = document.getElementById("topicInput").value.trim();
+    const outputBox = document.getElementById("outputBox");
+
+    if(topic === "") {
+      outputBox.innerText = "⚠️ Please enter a topic first!";
+      return;
+    }
+
+    // Simple title generator logic
+    const templates = [
+      `The Importance of ${topic}`,
+      `${topic}: An In-Depth Analysis`,
+      `Understanding ${topic}`,
+      `Top Insights on ${topic}`,
+      `The Ultimate Guide to ${topic}`
+    ];
+
+    outputBox.innerHTML = templates.join("\n");
+  }
+</script>
+
+</body>
+</html>
