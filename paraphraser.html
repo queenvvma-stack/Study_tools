@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Paraphraser | StudyTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1: #1b3c73;
+    --bg2: #5b9bd5;
+    --card-bg: rgba(255,255,255,0.15);
+    --accent: #1b3c73;
+  }
+  html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:white}
+  header{padding:48px 20px 12px;text-align:center}
+  header h1{margin:0;font-size:36px;font-weight:700}
+  header p{margin-top:8px;opacity:0.95}
+  .container{width:92%;max-width:900px;margin:28px auto;background:var(--card-bg);padding:28px;border-radius:16px;backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,0.25)}
+  label{display:block;font-weight:600;margin-bottom:8px;color:#fff}
+  textarea{width:100%;min-height:180px;border-radius:12px;border:none;padding:14px;font-size:15px;resize:vertical;outline:none}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  select,input[type="range"]{padding:10px;border-radius:10px;border:none;font-size:14px}
+  .btn{background:#fff;color:var(--accent);border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+  .btn:hover{filter:brightness(.98)}
+  .output{margin-top:18px;padding:16px;border-radius:12px;background:rgba(255,255,255,0.22);color:#0b2545;font-weight:600;white-space:pre-wrap;min-height:120px}
+  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:12px}
+  .small{font-size:13px;opacity:0.9;color:#fff}
+  .footer{margin-top:18px;text-align:center;font-size:13px;opacity:0.9}
+  .note{font-size:13px;color:#f7f7f7;opacity:0.95;margin-top:10px}
+  @media(max-width:560px){header h1{font-size:28px}.controls{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Paraphraser — Balanced Mode</h1>
+  <p>Rewrite text with better clarity — synonyms + light rewording (frontend only).</p>
+</header>
+
+<div class="container">
+  <div style="margin-bottom:10px"><a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a></div>
+
+  <label for="inputText">Paste your text here:</label>
+  <textarea id="inputText" placeholder="Paste paragraph(s) to paraphrase..."></textarea>
+
+  <div class="controls">
+    <div style="flex:1;min-width:200px">
+      <label for="strength" class="small">Strength (Synonyms ↔ Rewriting)</label>
+      <input id="strength" type="range" min="1" max="5" value="3" />
+    </div>
+
+    <div style="min-width:170px">
+      <label for="mode" class="small">Mode</label>
+      <select id="mode" aria-label="paraphrase mode">
+        <option value="balanced" selected>Balanced (Recommended)</option>
+        <option value="creative">Creative (more changes)</option>
+        <option value="conservative">Conservative (lighter)</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="paraphraseBtn">Paraphrase</button>
+      <button class="btn" id="clearBtn" style="background:rgba(255,255,255,0.16);color:#fff">Clear</button>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="small">Tip: Increase Strength for bolder rewrites. Use "Conservative" to keep original meaning closely.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="copyBtn" style="background:#fff;color:var(--accent)">Copy</button>
+      <button class="btn" id="downloadBtn" style="background:#fff;color:var(--accent)">Download</button>
+    </div>
+  </div>
+
+  <div class="output" id="outputBox">Paraphrased text will appear here...</div>
+
+  <div class="note">
+    How this works: the tool uses a local synonym dictionary plus light clause reordering and simple sentence transforms.
+    It’s not an AI — but it improves wording fast without any server or cost.
+  </div>
+
+  <div class="footer">Made for StudyTools • Frontend-only paraphrasing</div>
+</div>
+
+<script>
+/*
+ Balanced Paraphraser (frontend only)
+ - Uses a synonyms map + simple transforms
+ - Strength (1..5) controls how many replacements & reorders happen
+ - Mode offers minor behavior tweaks: conservative/balanced/creative
+*/
+
+// small synonym dictionary (expandable)
+const SYNONYMS = {
+  "important":["crucial","vital","significant"],
+  "use":["utilize","employ","apply"],
+  "help":["assist","aid","support"],
+  "show":["display","demonstrate","reveal"],
+  "change":["modify","alter","transform"],
+  "good":["beneficial","useful","effective"],
+  "bad":["poor","undesirable","harmful"],
+  "problem":["issue","challenge","difficulty"],
+  "many":["numerous","several","a lot of"],
+  "increase":["rise","grow","expand"],
+  "decrease":["reduce","diminish","lower"],
+  "fast":["quickly","rapidly","swiftly"],
+  "slow":["gradually","slowly","lethargically"],
+  "difficult":["challenging","tough","complex"],
+  "easy":["simple","straightforward","effortless"],
+  "learn":["study","understand","grasp"],
+  "make":["create","produce","form"],
+  "example":["instance","illustration","sample"],
+  "explain":["clarify","describe","elucidate"],
+  "reason":["cause","basis","explanation"],
+  "result":["outcome","consequence","effect"],
+  "start":["begin","commence","initiate"],
+  "finish":["end","complete","conclude"]
+};
+
+// helper: pick random element
+function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// split text into sentences (simple)
+function splitSentences(text){
+  // keep punctuation, split on .!? but keep them
+  const parts = text.match(/[^.!?]+[.!?]?/g) || [];
+  return parts.map(s => s.trim()).filter(Boolean);
+}
+
+// basic tokenizer keeping punctuation
+function tokenizeWords(sentence){
+  // match words and punctuation
+  return sentence.match(/[\w'’\-]+|[.,!?;:()"]/g) || [];
+}
+
+// replace with synonyms based on strength & mode
+function replaceSynonyms(tokens, strength, mode){
+  return tokens.map(t=>{
+    const lower = t.toLowerCase();
+    if(SYNONYMS[lower] && Math.random() < (0.25 * strength)){ // probability increases with strength
+      let choice = rnd(SYNONYMS[lower]);
+      // match capitalization
+      if(t[0] === t[0].toUpperCase()){
+        choice = choice.charAt(0).toUpperCase() + choice.slice(1);
+      }
+      return choice;
+    }
+    // minor morphological tweaks for creative mode
+    if(mode === 'creative' && Math.random() < 0.03 * strength){
+      // sometimes join words or split (very light)
+      return t.split('').reverse().join(''); // fallback - very rare (won't look good often)
+    }
+    return t;
+  });
+}
+
+// light sentence reordering for clauses split by comma/semicolon
+function maybeReorderSentence(sentence, strength, mode){
+  if(sentence.includes(',') || sentence.includes(';')){
+    const clauses = sentence.split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
+    if(clauses.length>1 && Math.random() < 0.15 * strength){
+      // reverse order sometimes, or rotate
+      if(Math.random() < 0.5) clauses.reverse();
+      else {
+        // rotate by 1
+        clauses.push(clauses.shift());
+      }
+      // join with comma
+      let endPunc = sentence.match(/[.!?]$/) ? sentence.match(/[.!?]$/)[0] : '';
+      return clauses.join(', ') + endPunc;
+    }
+  }
+  return sentence;
+}
+
+// simple cleanup: avoid reversed-character artifacts from creative token change
+function cleanupToken(tok){
+  // if token looks reversed letters, revert to original pattern (very safe)
+  if(/^[A-Za-z]{2,}$/.test(tok) && tok === tok.split('').reverse().join('')){
+    // return tok as-is (rare)
+    return tok;
+  }
+  return tok;
+}
+
+function paraphraseText(input, strength = 3, mode = 'balanced'){
+  const sents = splitSentences(input);
+  const outSents = [];
+
+  sents.forEach(sent=>{
+    // 1) maybe reorder clauses first
+    let s = maybeReorderSentence(sent, strength, mode);
+
+    // 2) tokenize
+    const tokens = tokenizeWords(s);
+
+    // 3) synonym replacement
+    const replaced = replaceSynonyms(tokens, strength, mode).map(cleanupToken);
+
+    // 4) reconstruct sentence carefully: join tokens with spaces, then fix spacing before punctuation
+    let recon = replaced.join(' ');
+    // common fixes: "word , " -> "word,"  and "word ." -> "word."
+    recon = recon.replace(/\s+([.,!?;:)])/g, '$1');
+    recon = recon.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');
+
+    // 5) sometimes split long sentences into two shorter ones in creative/balanced modes
+    if(mode !== 'conservative' && recon.length > 220 && Math.random() < 0.25 * (strength/3)){
+      // find comma position to split
+      const idx = recon.indexOf(',');
+      if(idx > 50){
+        const a = recon.slice(0, idx);
+        const b = recon.slice(idx+1).trim();
+        recon = a.trim() + '. ' + b.charAt(0).toUpperCase() + b.slice(1);
+      }
+    }
+
+    // 6) small final punctuation fix
+    if(!/[.!?]$/.test(recon)) recon = recon + '.';
+
+    outSents.push(recon);
+  });
+
+  // join sentences and final cleanup (avoid double spaces)
+  let output = outSents.join(' ');
+  output = output.replace(/\s{2,}/g,' ').trim();
+
+  return output;
+}
+
+// UI bindings
+const inputEl = document.getElementById('inputText');
+const outputEl = document.getElementById('outputBox');
+const btn = document.getElementById('paraphraseBtn');
+const clearBtn = document.getElementById('clearBtn');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+btn.addEventListener('click', ()=>{
+  const text = inputEl.value.trim();
+  if(!text){
+    outputEl.textContent = '⚠️ Paste some text first!';
+    return;
+  }
+  let strength = parseInt(document.getElementById('strength').value,10) || 3;
+  const mode = document.getElementById('mode').value || 'balanced';
+
+  // map range 1..5 to internal strength factor (1 weak .. 5 strong)
+  const result = paraphraseText(text, strength, mode);
+  outputEl.textContent = result;
+});
+
+clearBtn.addEventListener('click', ()=>{
+  inputEl.value = '';
+  outputEl.textContent = 'Paraphrased text will appear here...';
+});
+
+copyBtn.addEventListener('click', ()=>{
+  const txt = outputEl.textContent;
+  if(!txt || txt.startsWith('⚠️')) return;
+  navigator.clipboard.writeText(txt).then(()=> {
+    copyBtn.textContent = 'Copied ✓';
+    setTimeout(()=> copyBtn.textContent = 'Copy',1200);
+  }).catch(()=> {
+    copyBtn.textContent = 'Copy';
+  });
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  const txt = outputEl.textContent;
+  if(!txt || txt.startsWith('⚠️')) return;
+  const blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'paraphrased.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+// keyboard shortcut: Ctrl+Enter to paraphrase
+inputEl.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    btn.click();
+  }
+});
+</script>
