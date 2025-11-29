@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note Maker | StudyTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #1b3c73, #5b9bd5);
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 48px 20px 12px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+header p {
+  margin-top: 8px;
+  opacity: 0.95;
+}
+
+.container {
+  width: 92%;
+  max-width: 900px;
+  margin: 28px auto;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 28px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  background: white;
+  color: #1b3c73;
+  margin-top: 12px;
+  transition: .3s;
+}
+
+button:hover {
+  filter: brightness(.95);
+}
+
+.output {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 20px;
+  border-radius: 12px;
+  color: #1b3c73;
+  font-weight: 500;
+}
+
+h2 {
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+ul {
+  margin: 0;
+  padding-left: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Note Maker</h1>
+  <p>Automatically convert text into organized notes with headings & bullet points.</p>
+</header>
+
+<div class="container">
+
+  <div><a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a></div>
+
+  <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+  <button onclick="generateNotes()">Generate Notes</button>
+
+  <div id="output" class="output" style="display:none;"></div>
+
+</div>
+
+<script>
+function generateNotes() {
+  const text = document.getElementById("inputText").value.trim();
+  if (!text) {
+    alert("Please paste some text!");
+    return;
+  }
+
+  const sections = text.split(/\n+/g);
+  let notesHTML = "";
+  let currentHeading = null;
+  let buffer = [];
+
+  function flushSection() {
+    if (currentHeading && buffer.length) {
+      notesHTML += `<h2>${currentHeading}</h2><ul>`;
+      let uniquePoints = [...new Set(buffer)];
+      uniquePoints.forEach(point => notesHTML += `<li>${point}</li>`);
+      notesHTML += `</ul>`;
+    }
+    buffer = [];
+  }
+
+  sections.forEach(section => {
+    const s = section.trim();
+
+    if (s.length === 0) return;
+
+    if (/^[A-Z][A-Za-z0-9\s]{3,40}$/.test(s)) {
+      flushSection();
+      currentHeading = s;
+    } 
+    else {
+      let sentences = s.split(/[.!?]+/g).map(a => a.trim()).filter(a => a);
+      sentences.forEach(sent => buffer.push(sent));
+    }
+  });
+
+  flushSection();
+
+  document.getElementById("output").style.display = "block";
+  document.getElementById("output").innerHTML = notesHTML || "No notes generated.";
+}
+</script>
+
+</body>
+</html>
