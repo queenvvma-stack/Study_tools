@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Time Calculator | StudyTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #1b3c73, #5b9bd5);
+  color: white;
+}
+header {text-align:center;padding:48px 20px 12px;}
+header h1{margin:0;font-size:36px;font-weight:700;}
+header p{margin-top:8px;opacity:.95;}
+
+.container {
+  width: 92%;
+  max-width: 800px;
+  margin: 28px auto;
+  background: rgba(255,255,255,0.15);
+  padding: 28px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  padding: 14px;
+  border-radius: 12px;
+  outline: none;
+  border: none;
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: white;
+  color: #1b3c73;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: .3s;
+}
+button:hover {filter: brightness(0.95);}
+
+.result {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.25);
+  padding: 20px;
+  border-radius: 12px;
+  color: #1b3c73;
+  font-weight: 600;
+  font-size: 17px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Reading Time Calculator</h1>
+  <p>Find out how long it will take to read any text.</p>
+</header>
+
+<div class="container">
+
+  <a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a>
+
+  <textarea id="textInput" placeholder="Paste your text here..."></textarea>
+  <button onclick="calculateTime()">Calculate Reading Time</button>
+
+  <div id="output" class="result" style="display:none;"></div>
+
+</div>
+
+<script>
+function calculateTime(){
+  const text = document.getElementById("textInput").value.trim();
+  if(!text){
+    alert("Please paste some text!");
+    return;
+  }
+
+  const words = text.split(/\s+/).length;
+  const minutes = words / 200; // avg reading speed
+  const readMin = Math.floor(minutes);
+  const readSec = Math.round((minutes - readMin)*60);
+
+  const output = document.getElementById("output");
+  output.style.display = "block";
+  output.innerHTML = `
+    <p>Total Words: <strong>${words}</strong></p>
+    <p>Estimated Reading Time: <strong>${readMin} min ${readSec} sec</strong></p>
+  `;
+}
+</script>
+
+</body>
+</html>
