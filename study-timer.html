@@ -1,452 +1,523 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Study Timer (Advanced) | StudyTools</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg1:#0f3b66;
-    --bg2:#2a9df4;
-    --card: rgba(255,255,255,0.12);
-    --accent: #0f3b66;
-    --accent-strong:#07263f;
-    --muted: rgba(255,255,255,0.85);
-  }
-  html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff;display:flex;align-items:center;justify-content:center;padding:20px}
-  .wrap{width:100%;max-width:980px;margin:0 auto}
-  header{text-align:center;margin-bottom:18px}
-  header h1{margin:0;font-size:32px;font-weight:700}
-  header p{margin:6px 0 0;font-size:14px;opacity:0.95}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Timer - Study Suite</title>
+    <meta name="description" content="Stay focused and boost your productivity with a customizable study timer.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  .card{background:var(--card);padding:22px;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.25);display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:center}
-  @media(max-width:880px){.card{grid-template-columns:1fr;}}
-  .left{display:flex;flex-direction:column;align-items:center;gap:14px}
-  .ring-wrap{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center}
-  svg{transform:rotate(-90deg);width:260px;height:260px}
-  .time-display{position:absolute;text-align:center}
-  .time-display .minutes{font-size:36px;font-weight:700;color:#fff}
-  .time-display .label{font-size:13px;margin-top:6px;color:rgba(255,255,255,0.9)}
+    <style>
+        :root {
+            /* Color Palette - Premium & Modern */
+            --bg-body: #FAFAFA;
+            --bg-surface: #FFFFFF;
+            --text-primary: #18181B;
+            --text-secondary: #52525B;
+            --text-tertiary: #A1A1AA;
+            
+            --primary: #18181B;
+            --primary-hover: #27272A;
+            --accent: #4F46E5;
+            --accent-light: rgba(79, 70, 229, 0.1);
+            
+            --border-light: #E4E4E7;
+            --border-hover: #D4D4D8;
+            
+            /* Spacing */
+            --container-width: 1000px;
+            --header-height: 80px;
+            
+            /* Effects */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  .controls{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-  .btn{background:#fff;color:var(--accent);border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff}
-  .btn:active{transform:translateY(1px)}
-  .small{font-size:13px;color:rgba(255,255,255,0.9)}
+        /* Reset & Base Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .right{padding:6px 4px}
-  .section{background:rgba(255,255,255,0.04);padding:14px;border-radius:10px;margin-bottom:12px}
-  .section h3{margin:0 0 8px 0;font-size:16px}
-  label{display:block;font-size:13px;margin-bottom:6px;color:rgba(255,255,255,0.95)}
-  input[type="number"], input[type="range"], select{width:100%;padding:10px;border-radius:8px;border:none;font-size:14px;background:rgba(255,255,255,0.06);color:#fff;outline:none}
-  .row{display:flex;gap:8px}
-  .row > *{flex:1}
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:rgba(255,255,255,0.85);font-size:13px}
-  .footer{margin-top:8px;text-align:center;font-size:13px;opacity:0.9}
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.2;
+            font-weight: 600;
+        }
 
-  /* progress stroke colors */
-  .stroke-good{stroke: #2AEF7A}
-  .stroke-warn{stroke: #FFD166}
-  .stroke-bad{stroke: #FF6B6B}
-</style>
+        a { text-decoration: none; color: inherit; transition: var(--transition-base); }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo i { color: var(--accent); }
+
+        .nav-links a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-left: 32px;
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Main Tool Area */
+        main { flex: 1; padding: 60px 0; }
+
+        .tool-header { text-align: center; margin-bottom: 48px; }
+        
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, var(--text-primary) 0%, #444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tool-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .tool-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: var(--shadow-md);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Timer Display */
+        .timer-display {
+            font-family: 'Outfit', sans-serif;
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 24px 0;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+        
+        .timer-display.active {
+            color: var(--accent);
+        }
+
+        /* Inputs */
+        .input-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .time-input {
+            width: 80px;
+            padding: 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            outline: none;
+            transition: var(--transition-base);
+            background-color: #FAFAFA;
+        }
+
+        .time-input:focus {
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-base);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            border: 2px solid var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--border-hover);
+            background-color: #FAFAFA;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            background: white;
+            border-top: 1px solid var(--border-light);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .tool-card { padding: 24px; }
+            .tool-header h1 { font-size: 2rem; }
+            .timer-display { font-size: 4rem; }
+            .controls { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulsing {
+            animation: pulse 2s infinite ease-in-out;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
+
     <header>
-      <h1>Study Timer — Advanced</h1>
-      <p>Custom intervals, auto-cycle, sound & notifications. Use the progress ring or presets to study smarter.</p>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="ri-book-open-fill"></i>
+                Study Suite
+            </a>
+            <nav class="nav-links">
+                <a href="index.html"><i class="ri-arrow-left-line"></i> Back to Home</a>
+            </nav>
+        </div>
     </header>
 
-    <div class="card" role="application" aria-label="Study timer widget">
-      <!-- LEFT: Progress ring + controls -->
-      <div class="left">
-        <div class="ring-wrap" aria-hidden="false">
-          <!-- SVG ring -->
-          <svg id="progressRing" viewBox="0 0 100 100" role="img" aria-label="Progress ring">
-            <defs>
-              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#7AE7FF"/>
-                <stop offset="100%" stop-color="#2AEF7A"/>
-              </linearGradient>
-            </defs>
-            <circle cx="50" cy="50" r="45" fill="transparent" stroke="rgba(255,255,255,0.08)" stroke-width="8"></circle>
-            <circle id="progressPath" cx="50" cy="50" r="45" fill="transparent" stroke="url(#g1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="282.743" stroke-dashoffset="282.743" class="stroke-good"></circle>
-          </svg>
+    <main>
+        <div class="container">
+            <div class="tool-header">
+                <h1>Study Timer</h1>
+                <p>Stay focused and boost your productivity with a customizable timer.</p>
+            </div>
 
-          <div class="time-display" role="status" aria-live="polite">
-            <div class="minutes" id="timeText">25:00</div>
-            <div class="label" id="modeLabel">Work</div>
-          </div>
+            <div class="tool-card">
+                
+                <div id="timerDisplay" class="timer-display">25:00</div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label class="input-label">Minutes</label>
+                        <input type="number" id="minInput" class="time-input" value="25" min="0" max="999">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Seconds</label>
+                        <input type="number" id="secInput" class="time-input" value="00" min="0" max="59">
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="startBtn" class="btn btn-primary">
+                        <i class="ri-play-fill"></i> Start
+                    </button>
+                    <button id="pauseBtn" class="btn btn-secondary" style="display: none;">
+                        <i class="ri-pause-fill"></i> Pause
+                    </button>
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <i class="ri-refresh-line"></i> Reset
+                    </button>
+                </div>
+
+            </div>
         </div>
+    </main>
 
-        <div class="controls" role="group" aria-label="Timer controls">
-          <button class="btn" id="startBtn">Start</button>
-          <button class="btn ghost" id="pauseBtn" disabled>Pause</button>
-          <button class="btn ghost" id="resetBtn">Reset</button>
-          <button class="btn ghost" id="skipBtn">Skip</button>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <span>&copy; 2025 Study Suite</span>
+                <a href="index.html" style="color: var(--text-secondary);">Back to Home</a>
+            </div>
         </div>
+    </footer>
 
-        <div class="meta">
-          <div class="small">Cycles completed: <span id="cyclesDone">0</span></div>
-          <div class="small">Auto-cycle: <span id="autoCycleStatus">On</span></div>
-        </div>
-      </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const minInput = document.getElementById('minInput');
+            const secInput = document.getElementById('secInput');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
 
-      <!-- RIGHT: Settings -->
-      <div class="right">
-        <div class="section" aria-labelledby="presetLabel">
-          <h3 id="presetLabel">Presets</h3>
-          <div class="row">
-            <button class="btn" data-preset="pomodoro">Pomodoro (25/5)</button>
-            <button class="btn ghost" data-preset="short">Short Focus (15/5)</button>
-            <button class="btn ghost" data-preset="long">Deep Work (50/10)</button>
-          </div>
-          <div style="margin-top:8px" class="small">
-            Use these to quickly set timer intervals.
-          </div>
-        </div>
+            let countdown;
+            let totalSeconds;
+            let isRunning = false;
+            let isPaused = false;
+            let initialMinutes = 25;
+            let initialSeconds = 0;
 
-        <div class="section" aria-labelledby="customLabel">
-          <h3 id="customLabel">Custom Intervals (minutes)</h3>
-          <label>Work</label>
-          <input id="workInput" type="number" min="1" max="180" value="25" aria-label="Work minutes">
-          <label>Short Break</label>
-          <input id="shortInput" type="number" min="1" max="60" value="5" aria-label="Short break minutes">
-          <label>Long Break</label>
-          <input id="longInput" type="number" min="1" max="60" value="15" aria-label="Long break minutes">
-          <label style="margin-top:8px">Long break after N cycles</label>
-          <input id="cyclesInput" type="number" min="1" max="10" value="4" aria-label="Cycles before long break">
-        </div>
+            // Audio context setup (needs user interaction to start)
+            let audioContext;
 
-        <div class="section" aria-labelledby="optionsLabel">
-          <h3 id="optionsLabel">Options</h3>
-          <label>Auto-cycle next interval</label>
-          <select id="autoSelect" aria-label="Auto cycle">
-            <option value="on" selected>On</option>
-            <option value="off">Off (require manual start)</option>
-          </select>
+            function playAlert() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Create oscillator
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
 
-          <label style="margin-top:8px">Notification</label>
-          <select id="notifySelect" aria-label="Notification option">
-            <option value="browser">Browser + Sound</option>
-            <option value="sound">Sound only</option>
-            <option value="none">None</option>
-          </select>
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+                oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 0.5);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
 
-          <div style="margin-top:10px;">
-            <button class="btn" id="testSoundBtn">Test Sound</button>
-            <button class="btn ghost" id="reqPermBtn">Enable Notifications</button>
-          </div>
-        </div>
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
 
-        <div class="section" aria-labelledby="tipsLabel">
-          <h3 id="tipsLabel">Tips</h3>
-          <div class="small">Use presets to get started. If notifications are blocked, click "Enable Notifications". Press Skip to move to the next interval immediately.</div>
-        </div>
-      </div>
-    </div>
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
 
-    <div class="footer">Made for StudyTools • Advanced Timer • Frontend only</div>
-  </div>
+            function updateDisplay(secondsLeft) {
+                const minutes = Math.floor(secondsLeft / 60);
+                const remainderSeconds = secondsLeft % 60;
+                const display = `${minutes}:${remainderSeconds < 10 ? '0' : ''}${remainderSeconds}`;
+                timerDisplay.textContent = display;
+                document.title = `${display} - Study Timer`;
+            }
 
-<script>
-/* Advanced Study Timer Logic (frontend only) */
-/* - No external libraries
-   - Uses WebAudio for sound
-   - Uses Notification API optionally
-   - Progress ring animation via stroke-dashoffset
-*/
+            function startTimer() {
+                if (isRunning) return;
 
-(() => {
-  // Elements
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const skipBtn = document.getElementById('skipBtn');
-  const timeText = document.getElementById('timeText');
-  const modeLabel = document.getElementById('modeLabel');
-  const progressPath = document.getElementById('progressPath');
-  const cyclesDoneEl = document.getElementById('cyclesDone');
-  const autoCycleStatus = document.getElementById('autoCycleStatus');
+                // If starting fresh (not paused), get values from inputs
+                if (!isPaused) {
+                    const mins = parseInt(minInput.value) || 0;
+                    const secs = parseInt(secInput.value) || 0;
+                    
+                    // Store initial values for reset
+                    initialMinutes = mins;
+                    initialSeconds = secs;
+                    
+                    totalSeconds = mins * 60 + secs;
+                }
 
-  const workInput = document.getElementById('workInput');
-  const shortInput = document.getElementById('shortInput');
-  const longInput = document.getElementById('longInput');
-  const cyclesInput = document.getElementById('cyclesInput');
-  const autoSelect = document.getElementById('autoSelect');
-  const notifySelect = document.getElementById('notifySelect');
+                if (totalSeconds <= 0) return;
 
-  const testSoundBtn = document.getElementById('testSoundBtn');
-  const reqPermBtn = document.getElementById('reqPermBtn');
+                isRunning = true;
+                isPaused = false;
+                
+                // UI Updates
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'flex';
+                minInput.disabled = true;
+                secInput.disabled = true;
+                timerDisplay.classList.add('active');
 
-  // Presets
-  document.querySelectorAll('[data-preset]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const p = btn.dataset.preset;
-      if(p === 'pomodoro'){
-        workInput.value = 25; shortInput.value = 5; longInput.value = 15; cyclesInput.value = 4;
-      } else if(p === 'short'){
-        workInput.value = 15; shortInput.value = 5; longInput.value = 10; cyclesInput.value = 3;
-      } else if(p === 'long'){
-        workInput.value = 50; shortInput.value = 10; longInput.value = 20; cyclesInput.value = 4;
-      }
-      resetTimer();
-    });
-  });
+                // Immediate update
+                updateDisplay(totalSeconds);
 
-  // Timer state
-  let timer = null;
-  let remaining = 0; // seconds
-  let total = 0; // seconds
-  let running = false;
-  let currentMode = 'work'; // 'work' | 'short' | 'long'
-  let cyclesCompleted = 0;
+                countdown = setInterval(() => {
+                    totalSeconds--;
+                    updateDisplay(totalSeconds);
 
-  // progress ring values
-  const R = 45; // same as svg r
-  const circumference = 2 * Math.PI * R;
-  progressPath.style.strokeDasharray = circumference;
-  progressPath.style.strokeDashoffset = circumference;
+                    if (totalSeconds <= 0) {
+                        clearInterval(countdown);
+                        timerFinished();
+                    }
+                }, 1000);
+            }
 
-  // sound: simple beep using WebAudio
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            function pauseTimer() {
+                if (!isRunning) return;
+                
+                clearInterval(countdown);
+                isRunning = false;
+                isPaused = true;
+                
+                // UI Updates
+                startBtn.style.display = 'flex';
+                startBtn.innerHTML = '<i class="ri-play-fill"></i> Resume';
+                pauseBtn.style.display = 'none';
+                timerDisplay.classList.remove('active');
+            }
 
-  function beep(freq = 880, length = 0.18, type = 'sine', vol=0.15){
-    try{
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = type;
-      o.frequency.value = freq;
-      g.gain.value = vol;
-      o.connect(g);
-      g.connect(audioCtx.destination);
-      o.start();
-      g.gain.setValueAtTime(vol, audioCtx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + length);
-      o.stop(audioCtx.currentTime + length + 0.02);
-    }catch(e){
-      console.warn('sound error', e);
-    }
-  }
+            function resetTimer() {
+                clearInterval(countdown);
+                isRunning = false;
+                isPaused = false;
+                
+                // Reset values to last input
+                minInput.value = initialMinutes;
+                secInput.value = initialSeconds < 10 ? '0' + parseInt(initialSeconds) : initialSeconds;
+                
+                // UI Updates
+                updateDisplay(initialMinutes * 60 + parseInt(initialSeconds));
+                document.title = 'Study Timer - Study Suite';
+                
+                startBtn.style.display = 'flex';
+                startBtn.innerHTML = '<i class="ri-play-fill"></i> Start';
+                pauseBtn.style.display = 'none';
+                
+                minInput.disabled = false;
+                secInput.disabled = false;
+                timerDisplay.classList.remove('active');
+                timerDisplay.classList.remove('pulsing');
+            }
 
-  testSoundBtn.addEventListener('click', ()=>beep(880,0.18,'sine',0.18));
-  reqPermBtn.addEventListener('click', askNotificationPermission);
+            function timerFinished() {
+                isRunning = false;
+                isPaused = false;
+                
+                // UI Updates
+                startBtn.style.display = 'flex';
+                startBtn.innerHTML = '<i class="ri-play-fill"></i> Start';
+                pauseBtn.style.display = 'none';
+                
+                minInput.disabled = false;
+                secInput.disabled = false;
+                timerDisplay.classList.remove('active');
+                
+                // Pulse effect
+                timerDisplay.classList.add('pulsing');
+                
+                // Play sound
+                playAlert();
+                
+                // Optional: Notification
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("Time's up!", { body: "Your study session is complete." });
+                } else if ("Notification" in window && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("Time's up!", { body: "Your study session is complete." });
+                        }
+                    });
+                }
+            }
 
-  // Notifications
-  function askNotificationPermission(){
-    if(!('Notification' in window)) { alert('Browser notifications are not supported here.'); return; }
-    Notification.requestPermission().then(p=>{
-      alert('Notification permission: ' + p);
-    });
-  }
+            // Event Listeners
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
 
-  function notify(title, body){
-    const mode = notifySelect.value;
-    if(mode === 'none') return;
-    // sound
-    if(mode === 'sound' || mode === 'browser') beep(880,0.22,'sine',0.18);
-    if(mode === 'browser' && "Notification" in window && Notification.permission === "granted"){
-      try{
-        new Notification(title, { body });
-      }catch(e){
-        console.warn('notify failed', e);
-      }
-    }
-  }
-
-  // Utility: format seconds to mm:ss
-  function formatTime(s){
-    const mm = Math.floor(s/60).toString().padStart(2,'0');
-    const ss = Math.floor(s%60).toString().padStart(2,'0');
-    return `${mm}:${ss}`;
-  }
-
-  // Initialize timer values from inputs
-  function getDurations(){
-    const work = Math.max(1, parseInt(workInput.value,10) || 25) * 60;
-    const short = Math.max(1, parseInt(shortInput.value,10) || 5) * 60;
-    const long = Math.max(1, parseInt(longInput.value,10) || 15) * 60;
-    const cycles = Math.max(1, parseInt(cyclesInput.value,10) || 4);
-    return { work, short, long, cycles };
-  }
-
-  function setMode(mode){
-    currentMode = mode;
-    modeLabel.textContent = mode === 'work' ? 'Work' : (mode === 'short' ? 'Short Break' : 'Long Break');
-    // stroke color by mode
-    progressPath.classList.remove('stroke-good','stroke-warn','stroke-bad');
-    if(mode === 'work') progressPath.classList.add('stroke-good');
-    else if(mode === 'short') progressPath.classList.add('stroke-warn');
-    else progressPath.classList.add('stroke-bad');
-  }
-
-  function startTimer(){
-    if(running) return;
-    if(!remaining || remaining <= 0){
-      // fresh start
-      const d = getDurations();
-      if(currentMode === 'work') { total = d.work; remaining = d.work; }
-      else if(currentMode === 'short'){ total = d.short; remaining = d.short; }
-      else { total = d.long; remaining = d.long; }
-    }
-    running = true;
-    startBtn.disabled = true;
-    pauseBtn.disabled = false;
-    pauseBtn.classList.remove('disabled');
-    // ensure audio context resumed (required on some mobile)
-    if(audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); }
-
-    timer = setInterval(()=>{
-      remaining--;
-      if(remaining < 0) remaining = 0;
-      updateUI();
-      if(remaining === 0){
-        clearInterval(timer);
-        timer = null;
-        running = false;
-        startBtn.disabled = false;
-        pauseBtn.disabled = true;
-        // Completed an interval
-        onIntervalComplete();
-      }
-    }, 1000);
-  }
-
-  function pauseTimer(){
-    if(!running) return;
-    running = false;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
-    if(timer) clearInterval(timer);
-    timer = null;
-  }
-
-  function resetTimer(fullReset=false){
-    if(timer) { clearInterval(timer); timer = null; }
-    running = false;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
-    const d = getDurations();
-    // If fullReset, go to work mode and reset cycles
-    if(fullReset){
-      setMode('work');
-      cyclesCompleted = 0;
-      cyclesDoneEl.textContent = cyclesCompleted;
-    }
-    // set remaining to current mode default
-    if(currentMode === 'work'){ total = d.work; remaining = d.work; }
-    else if(currentMode === 'short'){ total = d.short; remaining = d.short; }
-    else { total = d.long; remaining = d.long; }
-    updateUI(true);
-  }
-
-  function skipInterval(){
-    // stop current and move to next
-    if(timer){ clearInterval(timer); timer = null; }
-    running = false;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
-    onIntervalComplete(true);
-  }
-
-  function updateUI(force=false){
-    timeText.textContent = formatTime(remaining);
-    // progress ring update
-    if(total > 0){
-      const pct = (total - remaining) / total; // 0..1
-      const offset = Math.max(0, circumference - (circumference * pct));
-      progressPath.style.strokeDashoffset = offset;
-    } else {
-      progressPath.style.strokeDashoffset = circumference;
-    }
-    // label update handled in setMode
-    // cycles
-    cyclesDoneEl.textContent = cyclesCompleted;
-    autoCycleStatus.textContent = (autoSelect.value === 'on') ? 'On' : 'Off';
-    // when forced (like on reset), ensure display updated
-    if(force && remaining) timeText.textContent = formatTime(remaining);
-  }
-
-  function onIntervalComplete(skipped=false){
-    // Play sound / notify
-    notify('Interval complete', `${modeLabel.textContent} finished.`);
-    // Advance cycle logic
-    const d = getDurations();
-    if(currentMode === 'work'){
-      cyclesCompleted++;
-      cyclesDoneEl.textContent = cyclesCompleted;
-      // decide next: long or short break
-      if(cyclesCompleted % d.cycles === 0){
-        setMode('long');
-      } else {
-        setMode('short');
-      }
-    } else {
-      // if break complete, go to work
-      setMode('work');
-    }
-    // set new durations
-    const nextDur = (currentMode === 'work') ? (cyclesCompleted % d.cycles === 0 ? d.long : d.short) : d.work;
-    total = nextDur; remaining = nextDur;
-    updateUI(true);
-
-    // auto-cycle decision: start automatically or not
-    const auto = autoSelect.value === 'on';
-    if(auto && !skipped){
-      // small delay before starting next
-      setTimeout(()=> startTimer(), 700);
-    } else {
-      // waiting for manual start
-    }
-  }
-
-  // initial setup
-  setMode('work');
-  resetTimer(true);
-
-  // button events
-  startBtn.addEventListener('click', ()=>{
-    // ensure inputs numbers are synced
-    resetTimer(false);
-    startTimer();
-  });
-
-  pauseBtn.addEventListener('click', pauseTimer);
-  resetBtn.addEventListener('click', ()=> resetTimer(true));
-  skipBtn.addEventListener('click', skipInterval);
-
-  // when user changes input durations, reset the current interval length to reflect new value
-  [workInput, shortInput, longInput, cyclesInput, autoSelect].forEach(el=>{
-    el.addEventListener('change', ()=> {
-      // if currently in work/short/long, reset remaining to new duration for current mode
-      const d = getDurations();
-      if(currentMode === 'work'){ total = d.work; remaining = d.work; }
-      else if(currentMode === 'short'){ total = d.short; remaining = d.short; }
-      else { total = d.long; remaining = d.long; }
-      updateUI(true);
-    });
-  });
-
-  // sound on end handled in notify(); also allow manual test
-  // Accessibility: space/enter on focused buttons should work naturally
-
-  // small safety: resume audio context on first user gesture (some browsers block audio)
-  document.addEventListener('click', ()=> {
-    if(audioCtx && audioCtx.state === 'suspended'){
-      audioCtx.resume().catch(()=>{});
-    }
-  }, {once:true});
-
-  // keyboard shortcuts
-  document.addEventListener('keydown', (e)=>{
-    if(e.code === 'Space'){ e.preventDefault(); if(running) pauseTimer(); else startTimer(); }
-    if(e.key === 's' || e.key === 'S'){ startTimer(); }
-    if(e.key === 'p' || e.key === 'P'){ pauseTimer(); }
-  });
-
-})();
-</script>
+            // Input handling to pad zeros
+            minInput.addEventListener('change', function() {
+                if (this.value < 0) this.value = 0;
+                updateDisplay(parseInt(this.value) * 60 + (parseInt(secInput.value) || 0));
+            });
+            
+            secInput.addEventListener('change', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.value > 59) this.value = 59;
+                if (this.value < 10 && this.value.length < 2) this.value = '0' + this.value;
+                updateDisplay((parseInt(minInput.value) || 0) * 60 + parseInt(this.value));
+            });
+        });
+    </script>
 </body>
 </html>
