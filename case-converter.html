@@ -1,82 +1,585 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Converter</title>
+    <title>Case Converter - Study Suite</title>
+    <meta name="description" content="Instantly convert text to uppercase, lowercase, title case, sentence case, and more.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
     <style>
+        :root {
+            /* Color Palette - Premium & Modern */
+            --bg-body: #FAFAFA;
+            --bg-surface: #FFFFFF;
+            --text-primary: #18181B;
+            --text-secondary: #52525B;
+            --text-tertiary: #A1A1AA;
+            
+            --primary: #18181B;
+            --primary-hover: #27272A;
+            --accent: #4F46E5;
+            --accent-light: rgba(79, 70, 229, 0.1);
+            
+            --border-light: #E4E4E7;
+            --border-hover: #D4D4D8;
+            
+            /* Spacing */
+            --container-width: 1000px;
+            --header-height: 80px;
+            
+            /* Effects */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 750px;
-            margin: auto;
-            padding: 20px;
-            background: #eef3fa;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        h1 {
-            text-align: center;
-            color: #222;
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.2;
+            font-weight: 600;
         }
+
+        a { text-decoration: none; color: inherit; transition: var(--transition-base); }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo i { color: var(--accent); }
+
+        .nav-links a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Main Tool Area */
+        main { flex: 1; padding: 60px 0; }
+
+        .tool-header { text-align: center; margin-bottom: 48px; }
+        
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, var(--text-primary) 0%, #444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tool-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .tool-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Text Areas */
+        .text-area-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .area-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .area-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .area-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--bg-body);
+            border: 1px solid transparent;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+            background: white;
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .action-btn.primary-action {
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+        
+        .action-btn.primary-action:hover {
+            background: rgba(79, 70, 229, 0.2);
+        }
+
         textarea {
             width: 100%;
-            height: 180px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 2px solid #ccc;
-            resize: none;
+            height: 200px;
+            padding: 20px;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            font-family: 'Plus Jakarta Sans', sans-serif; /* Keep nice font for readability */
+            font-size: 1.05rem;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition-base);
+            background: #FAFAFA;
+            color: var(--text-primary);
         }
-        button {
-            padding: 12px 18px;
-            border: none;
-            background: #0066ff;
+
+        textarea:focus {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+        
+        textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Case Controls */
+        .case-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 24px;
+            background: var(--bg-body);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            justify-content: center;
+        }
+
+        .case-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            background: white;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            transition: var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .case-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-hover);
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .case-btn.active {
+            background: var(--primary);
             color: white;
-            font-size: 16px;
-            border-radius: 8px;
-            margin: 5px 5px 0 0;
-            cursor: pointer;
+            border-color: var(--primary);
         }
-        button:hover {
-            background: #004cc7;
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .stats-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .stat-item strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            background: white;
+            border-top: 1px solid var(--border-light);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .tool-card { padding: 20px; border-radius: 16px; }
+            .case-controls { gap: 8px; padding: 16px; }
+            .case-btn { flex: 1 1 calc(50% - 8px); font-size: 0.85rem; text-align: center; }
+            .area-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .area-actions { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
 <body>
 
-<h1>Case Converter</h1>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="ri-book-open-fill"></i>
+                Study Suite
+            </a>
+            <nav class="nav-links">
+                <a href="index.html"><i class="ri-arrow-left-line"></i> Back to Home</a>
+            </nav>
+        </div>
+    </header>
 
-<textarea id="textInput" placeholder="Type or paste text here..."></textarea>
+    <main>
+        <div class="container">
+            <div class="tool-header">
+                <h1>Case Converter</h1>
+                <p>Instantly convert text to uppercase, lowercase, title case, and more.</p>
+            </div>
 
-<br>
+            <div class="tool-card">
+                
+                <!-- Input Area -->
+                <div class="text-area-container">
+                    <div class="area-header">
+                        <span class="area-label">Input Text</span>
+                        <div class="area-actions">
+                            <button class="action-btn" onclick="clearText()" title="Clear text">
+                                <i class="ri-delete-bin-line"></i> Clear
+                            </button>
+                            <button class="action-btn" onclick="pasteText()" title="Paste from clipboard">
+                                <i class="ri-clipboard-line"></i> Paste
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="inputText" placeholder="Type or paste your text here..."></textarea>
+                </div>
 
-<button onclick="toUpper()">UPPERCASE</button>
-<button onclick="toLower()">lowercase</button>
-<button onclick="toCapitalized()">Capitalized Case</button>
-<button onclick="toSentence()">Sentence case</button>
+                <!-- Controls -->
+                <div class="case-controls">
+                    <button class="case-btn" onclick="convert('sentence', this)">Sentence case</button>
+                    <button class="case-btn" onclick="convert('lower', this)">lower case</button>
+                    <button class="case-btn" onclick="convert('upper', this)">UPPER CASE</button>
+                    <button class="case-btn" onclick="convert('capitalized', this)">Capitalized Case</button>
+                    <button class="case-btn" onclick="convert('title', this)">Title Case</button>
+                    <button class="case-btn" onclick="convert('alternating', this)">aLtErNaTiNg cAsE</button>
+                </div>
 
-<script>
-function toUpper() {
-    let t = document.getElementById("textInput");
-    t.value = t.value.toUpperCase();
-}
+                <!-- Output Area (Actually just updates input in place usually, but let's follow user request for input/output areas or preview) -->
+                <!-- Wait, user asked for "Preview area". But case converters usually work better in-place or 2-pane. 
+                     Let's do a single pane that updates, but maybe a "Copy" button that implies result is ready.
+                     Actually, user said "Input and output areas". Let's add a read-only output area for the result to be clear. -->
+                
+                <div class="text-area-container">
+                     <div class="area-header">
+                        <span class="area-label">Converted Result</span>
+                        <div class="area-actions">
+                            <button class="action-btn primary-action" onclick="copyOutput()" title="Copy to clipboard">
+                                <i class="ri-file-copy-line"></i> Copy Result
+                            </button>
+                            <button class="action-btn" onclick="downloadText()" title="Download as text file">
+                                <i class="ri-download-line"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="outputText" readonly placeholder="Result will appear here..."></textarea>
+                </div>
 
-function toLower() {
-    let t = document.getElementById("textInput");
-    t.value = t.value.toLowerCase();
-}
+                <!-- Stats -->
+                <div class="stats-bar">
+                    <div class="stats-group">
+                        <span class="stat-item">Character Count: <strong id="charCount">0</strong></span>
+                        <span class="stat-item">Word Count: <strong id="wordCount">0</strong></span>
+                    </div>
+                    <div class="stats-group">
+                        <span class="stat-item">Lines: <strong id="lineCount">0</strong></span>
+                    </div>
+                </div>
 
-function toCapitalized() {
-    let t = document.getElementById("textInput");
-    t.value = t.value
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
-}
+            </div>
+        </div>
+    </main>
 
-function toSentence() {
-    let t = document.getElementById("textInput");
-    let text = t.value.toLowerCase();
-    t.value = text.charAt(0).toUpperCase() + text.slice(1);
-}
-</script>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <span>&copy; 2025 Study Suite</span>
+                <a href="index.html" style="color: var(--text-secondary);">Back to Home</a>
+            </div>
+        </div>
+    </footer>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="ri-check-line"></i>
+        <span id="toastMsg">Action successful</span>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const charCount = document.getElementById('charCount');
+        const wordCount = document.getElementById('wordCount');
+        const lineCount = document.getElementById('lineCount');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        let lastMode = 'sentence';
+
+        // Sample Text
+        const sampleText = "Welcome to the case converter tool. Type or paste your content here to see the magic happen! It handles multiple lines, punctuation, and special characters with ease.";
+        inputText.value = sampleText;
+        updateStats();
+        convert('sentence'); // Default conversion
+
+        // Event Listeners
+        inputText.addEventListener('input', () => {
+            updateStats();
+            // Auto-update output if a mode was selected? 
+            // Let's keep it manual click to avoid jumping, or remember last mode.
+            // For now, simple click. But user asked for "Real-time case conversion".
+            // Let's store last mode and auto-convert.
+            if (lastMode) convert(lastMode);
+        });
+
+        function updateStats() {
+            const text = inputText.value;
+            charCount.textContent = text.length;
+            wordCount.textContent = text.trim() ? text.trim().split(/\s+/).length : 0;
+            lineCount.textContent = text.split(/\r\n|\r|\n/).length;
+        }
+
+        function convert(mode, btn) {
+            const text = inputText.value;
+            let result = '';
+            lastMode = mode;
+
+            // Highlight active button
+            if (btn) {
+                document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            
+            if (!text) {
+                outputText.value = "";
+                return;
+            }
+
+            switch(mode) {
+                case 'upper':
+                    result = text.toUpperCase();
+                    break;
+                case 'lower':
+                    result = text.toLowerCase();
+                    break;
+                case 'sentence':
+                    // Sentence case: Capitalize first letter of each sentence.
+                    // Split by (. ! ?) and keep delimiters.
+                    result = text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
+                    break;
+                case 'capitalized':
+                    // Capitalize first letter of every word
+                    result = text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+                    break;
+                case 'title':
+                    // Title Case: Capitalize words except minor words (a, an, the, etc) unless first word
+                    const minorWords = ['a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor', 'on', 'at', 'to', 'from', 'by', 'in', 'of'];
+                    result = text.toLowerCase().replace(/\b\w+/g, (word, index) => {
+                        if (index > 0 && minorWords.includes(word)) return word;
+                        return word.charAt(0).toUpperCase() + word.slice(1);
+                    });
+                    break;
+                case 'alternating':
+                    result = text.split('').map((c, i) => i % 2 === 0 ? c.toLowerCase() : c.toUpperCase()).join('');
+                    break;
+            }
+
+            outputText.value = result;
+        }
+
+        function clearText() {
+            inputText.value = '';
+            outputText.value = '';
+            updateStats();
+            inputText.focus();
+            showToast('Text cleared');
+        }
+
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                inputText.value = text;
+                updateStats();
+                convert(lastMode);
+                showToast('Text pasted');
+            } catch (err) {
+                showToast('Failed to paste (permission denied?)');
+            }
+        }
+
+        function copyOutput() {
+            if (!outputText.value) {
+                showToast('Nothing to copy!');
+                return;
+            }
+            outputText.select();
+            navigator.clipboard.writeText(outputText.value).then(() => {
+                showToast('Result copied to clipboard');
+            });
+        }
+
+        function downloadText() {
+            if (!outputText.value) {
+                showToast('Nothing to download!');
+                return;
+            }
+            const blob = new Blob([outputText.value], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'converted-text.txt';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showToast('File downloaded');
+        }
+
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                convert(lastMode); // Re-trigger conversion visually
+                showToast('Converted!');
+            }
+        });
+        
+        // Initial Highlight
+        // Convert logic handles highlighting only on click, let's force highlight Sentence button on load
+        const sentenceBtn = Array.from(document.querySelectorAll('.case-btn')).find(b => b.textContent.includes('Sentence'));
+        if(sentenceBtn) sentenceBtn.classList.add('active');
+
+    </script>
 </body>
 </html>
+
