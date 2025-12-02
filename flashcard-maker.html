@@ -1,70 +1,528 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flashcard Maker | StudyTools</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-body {
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background: linear-gradient(135deg,#1b3c73,#5b9bd5);
-  color:white;
-}
-header {text-align:center;padding:48px 20px 12px;}
-header h1{margin:0;font-size:36px;font-weight:700;}
-header p{margin-top:8px;opacity:0.95;}
-.container{width:92%;max-width:800px;margin:28px auto;background:rgba(255,255,255,0.15);padding:28px;border-radius:16px;backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,0.25);}
-input, textarea{width:100%;padding:14px;margin-top:12px;border-radius:12px;border:none;font-size:15px;outline:none;}
-button{padding:12px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer;background:white;color:#1b3c73;margin-top:12px;transition:.3s;}
-button:hover{filter:brightness(.95);}
-.flashcards{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px;}
-.card{width:calc(33% - 12px);background:rgba(255,255,255,0.22);color:#1b3c73;padding:14px;border-radius:12px;font-weight:600;cursor:pointer;text-align:center;transition:.3s;user-select:none;}
-.card:hover{transform:scale(1.05);}
-.card.flipped{background:#fff;color:#1b3c73;}
-@media(max-width:720px){.card{width:calc(50% - 12px);}}
-@media(max-width:480px){.card{width:100%;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Maker - Study Suite</title>
+    <meta name="description" content="Create, study, and master your subjects with our premium flashcard maker.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAFA',
+                        foreground: '#18181B',
+                        card: '#FFFFFF',
+                        'card-foreground': '#18181B',
+                        primary: '#18181B',
+                        'primary-foreground': '#FFFFFF',
+                        secondary: '#F4F4F5',
+                        'secondary-foreground': '#18181B',
+                        muted: '#F4F4F5',
+                        'muted-foreground': '#71717A',
+                        accent: '#4F46E5',
+                        'accent-foreground': '#FFFFFF',
+                        destructive: '#EF4444',
+                        border: '#E4E4E7',
+                        input: '#E4E4E7',
+                        ring: '#4F46E5',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                        'premium-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                        'premium-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                        'premium-hover': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E4E4E7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1AA;
+        }
+        
+        .glass-header {
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            color: #18181B;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #E4E4E7;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
 </head>
-<body>
-<header>
-<h1>Flashcard Maker</h1>
-<p>Create interactive study flashcards for any topic!</p>
-</header>
+<body class="bg-background text-foreground font-sans min-h-screen selection:bg-accent/10 selection:text-accent">
 
-<div class="container">
-  <div style="margin-bottom:10px"><a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a></div>
+    <!-- Header -->
+    <header class="glass-header fixed top-0 left-0 right-0 z-50 h-20 flex items-center transition-all duration-300">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group cursor-pointer decoration-0">
+                <div class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <span class="font-heading text-xl font-bold tracking-tight text-primary">Study Suite</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Tools</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">About</a>
+            </nav>
+        </div>
+    </header>
 
-  <input id="questionInput" placeholder="Enter Question">
-  <textarea id="answerInput" placeholder="Enter Answer"></textarea>
-  <button id="addBtn">Add Flashcard</button>
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 container mx-auto px-6 max-w-5xl">
+        
+        <!-- Breadcrumb -->
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+        </div>
 
-  <div class="flashcards" id="flashcardContainer"></div>
-</div>
+        <div class="text-center mb-12 animate-slide-up">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6 border border-accent/20">
+                Premium Tools
+            </span>
+            <h1 class="font-heading text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-b from-primary to-zinc-600 bg-clip-text text-transparent pb-2">
+                Flashcard Maker
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Create, edit, and study your flashcards with our smart tool. Export them anytime or shuffle to test your knowledge.
+            </p>
+        </div>
 
-<script>
-const questionInput=document.getElementById('questionInput');
-const answerInput=document.getElementById('answerInput');
-const addBtn=document.getElementById('addBtn');
-const flashcardContainer=document.getElementById('flashcardContainer');
+        <!-- Editor Section -->
+        <div class="bg-card border border-border rounded-2xl p-8 shadow-premium-lg mb-12 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="flex items-center justify-between mb-8 border-b border-border pb-6">
+                <h2 class="font-heading text-2xl font-semibold flex items-center gap-3" id="form-title">
+                    <i data-lucide="plus" class="w-5 h-5 text-accent"></i>
+                    Create New Flashcard
+                </h2>
+                <div class="text-sm text-muted-foreground font-medium bg-secondary px-3 py-1 rounded-md">
+                    Total Cards: <span class="text-primary font-bold" id="total-cards">0</span>
+                </div>
+            </div>
 
-addBtn.addEventListener('click',()=>{
-  const q=questionInput.value.trim();
-  const a=answerInput.value.trim();
-  if(!q||!a){alert('Please enter both question and answer!');return;}
-  createFlashcard(q,a);
-  questionInput.value='';answerInput.value='';
-});
+            <form id="flashcard-form" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-sm font-medium text-secondary-foreground uppercase tracking-wide">Front Side</label>
+                        <textarea 
+                            id="front-input"
+                            class="w-full h-40 p-4 rounded-xl bg-background border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none text-base placeholder:text-muted-foreground/50 outline-none shadow-sm"
+                            placeholder="e.g. What is the capital of France?"
+                            maxlength="500"
+                        ></textarea>
+                        <div class="flex justify-end">
+                            <span class="text-xs text-muted-foreground">Max 500 chars</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="text-sm font-medium text-secondary-foreground uppercase tracking-wide">Back Side</label>
+                        <textarea 
+                            id="back-input"
+                            class="w-full h-40 p-4 rounded-xl bg-background border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none text-base placeholder:text-muted-foreground/50 outline-none shadow-sm"
+                            placeholder="e.g. Paris"
+                            maxlength="1000"
+                        ></textarea>
+                        <div class="flex justify-end">
+                            <span class="text-xs text-muted-foreground">Max 1000 chars</span>
+                        </div>
+                    </div>
+                </div>
 
-function createFlashcard(q,a){
-  const card=document.createElement('div');
-  card.className='card';
-  card.innerHTML=`<div class="front">${q}</div><div class="back">${a}</div>`;
-  card.style.minHeight='80px';
-  card.addEventListener('click',()=>card.classList.toggle('flipped'));
-  flashcardContainer.appendChild(card);
-}
-</script>
+                <div class="pt-4 flex items-center gap-4">
+                    <button 
+                        type="submit" 
+                        id="submit-btn"
+                        class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-primary text-white px-8 py-3.5 rounded-xl font-semibold shadow-premium-md hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-premium-lg transition-all active:translate-y-0 active:shadow-sm"
+                    >
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add Flashcard
+                    </button>
+                    
+                    <button 
+                        type="button" 
+                        id="cancel-btn"
+                        class="hidden inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3.5 rounded-xl font-medium hover:bg-secondary/80 transition-all"
+                    >
+                        <i data-lucide="x" class="w-4 h-4"></i> Cancel
+                    </button>
+                    
+                    <div class="hidden md:block text-xs text-muted-foreground ml-auto">
+                        Press <kbd class="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-xs">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-xs">Enter</kbd> to add
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Actions Toolbar -->
+        <div id="actions-toolbar" class="hidden flex flex-wrap items-center gap-3 mb-8 animate-slide-up" style="animation-delay: 0.2s;">
+            <button onclick="app.shuffleCards()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-border text-sm font-medium text-muted-foreground hover:text-primary hover:border-accent/50 hover:shadow-sm transition-all">
+                <i data-lucide="shuffle" class="w-4 h-4"></i> Shuffle
+            </button>
+            <button onclick="app.copyToClipboard()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-border text-sm font-medium text-muted-foreground hover:text-primary hover:border-accent/50 hover:shadow-sm transition-all">
+                <i data-lucide="copy" class="w-4 h-4"></i> Copy All
+            </button>
+            <button onclick="app.downloadCards()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-border text-sm font-medium text-muted-foreground hover:text-primary hover:border-accent/50 hover:shadow-sm transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i> Export JSON
+            </button>
+            <div class="flex-grow"></div>
+            <button onclick="app.clearAll()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 border border-red-100 text-sm font-medium text-red-600 hover:bg-red-100 hover:border-red-200 transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Clear All
+            </button>
+        </div>
+
+        <!-- Grid -->
+        <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-20 border-2 border-dashed border-border rounded-2xl">
+            <div class="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="book-open" class="w-8 h-8 text-muted-foreground"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-1">No Flashcards Yet</h3>
+            <p class="text-muted-foreground max-w-xs mx-auto">Create your first flashcard above to get started with your study session.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-white py-12">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <span class="font-heading font-bold text-lg">Study Suite</span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+                &copy; <span id="year"></span> Study Suite. Premium Tools for Students.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+        <div>
+            <h4 class="font-semibold text-sm" id="toast-title">Success</h4>
+            <p class="text-sm text-muted-foreground" id="toast-msg">Operation completed.</p>
+        </div>
+    </div>
+
+    <script>
+        // App Logic
+        const app = {
+            cards: [],
+            editingId: null,
+
+            init() {
+                this.loadCards();
+                this.cacheDOM();
+                this.bindEvents();
+                this.render();
+                document.getElementById('year').textContent = new Date().getFullYear();
+                lucide.createIcons();
+            },
+
+            cacheDOM() {
+                this.dom = {
+                    form: document.getElementById('flashcard-form'),
+                    frontInput: document.getElementById('front-input'),
+                    backInput: document.getElementById('back-input'),
+                    submitBtn: document.getElementById('submit-btn'),
+                    cancelBtn: document.getElementById('cancel-btn'),
+                    formTitle: document.getElementById('form-title'),
+                    grid: document.getElementById('cards-grid'),
+                    emptyState: document.getElementById('empty-state'),
+                    actionsToolbar: document.getElementById('actions-toolbar'),
+                    totalCards: document.getElementById('total-cards'),
+                    toast: document.getElementById('toast'),
+                    toastTitle: document.getElementById('toast-title'),
+                    toastMsg: document.getElementById('toast-msg')
+                };
+            },
+
+            bindEvents() {
+                this.dom.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSubmit();
+                });
+
+                this.dom.cancelBtn.addEventListener('click', () => this.cancelEdit());
+
+                // Keyboard Shortcut
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        this.handleSubmit();
+                    }
+                });
+            },
+
+            loadCards() {
+                const saved = localStorage.getItem("study-suite-flashcards");
+                if (saved) {
+                    try {
+                        this.cards = JSON.parse(saved);
+                    } catch (e) {
+                        console.error("Failed to load", e);
+                    }
+                } else {
+                    // Sample Data
+                    this.cards = [
+                        { id: "1", front: "What is the powerhouse of the cell?", back: "Mitochondria", createdAt: Date.now() },
+                        { id: "2", front: "Define 'Polymorphism' in OOP.", back: "Polymorphism allows objects of different classes to be treated as objects of a common superclass.", createdAt: Date.now() }
+                    ];
+                    this.saveCards();
+                }
+            },
+
+            saveCards() {
+                localStorage.setItem("study-suite-flashcards", JSON.stringify(this.cards));
+                this.render();
+            },
+
+            handleSubmit() {
+                const front = this.dom.frontInput.value.trim();
+                const back = this.dom.backInput.value.trim();
+
+                if (!front || !back) {
+                    this.showToast("Error", "Both sides of the card are required.", true);
+                    return;
+                }
+
+                if (this.editingId) {
+                    this.cards = this.cards.map(c => c.id === this.editingId ? { ...c, front, back } : c);
+                    this.showToast("Updated", "Flashcard updated successfully.");
+                    this.cancelEdit();
+                } else {
+                    const newCard = {
+                        id: crypto.randomUUID(),
+                        front,
+                        back,
+                        createdAt: Date.now()
+                    };
+                    this.cards.unshift(newCard);
+                    this.showToast("Success", "New flashcard added.");
+                    this.dom.form.reset();
+                    this.dom.frontInput.focus();
+                }
+                this.saveCards();
+            },
+
+            editCard(id) {
+                const card = this.cards.find(c => c.id === id);
+                if (!card) return;
+
+                this.editingId = id;
+                this.dom.frontInput.value = card.front;
+                this.dom.backInput.value = card.back;
+                
+                // Update UI
+                this.dom.formTitle.innerHTML = '<i data-lucide="edit-2" class="w-5 h-5 text-accent"></i> Edit Flashcard';
+                this.dom.submitBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save Changes';
+                this.dom.cancelBtn.classList.remove('hidden');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.dom.frontInput.focus();
+                lucide.createIcons();
+            },
+
+            cancelEdit() {
+                this.editingId = null;
+                this.dom.form.reset();
+                
+                // Reset UI
+                this.dom.formTitle.innerHTML = '<i data-lucide="plus" class="w-5 h-5 text-accent"></i> Create New Flashcard';
+                this.dom.submitBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Add Flashcard';
+                this.dom.cancelBtn.classList.add('hidden');
+                lucide.createIcons();
+            },
+
+            deleteCard(id) {
+                if(confirm('Delete this card?')) {
+                    this.cards = this.cards.filter(c => c.id !== id);
+                    this.saveCards();
+                    this.showToast("Deleted", "Flashcard removed.");
+                    
+                    if(this.editingId === id) {
+                        this.cancelEdit();
+                    }
+                }
+            },
+
+            clearAll() {
+                if (confirm("Are you sure you want to delete all flashcards?")) {
+                    this.cards = [];
+                    this.saveCards();
+                    this.showToast("Cleared", "All flashcards deleted.");
+                }
+            },
+
+            shuffleCards() {
+                this.cards.sort(() => Math.random() - 0.5);
+                this.saveCards(); // Save shuffled order? Or just render? React version saves it.
+                this.showToast("Shuffled", "Deck randomized.");
+            },
+
+            copyToClipboard() {
+                const text = this.cards.map((c, i) => `Card ${i + 1}\nFront: ${c.front}\nBack: ${c.back}\n`).join("\n---\n");
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showToast("Copied", "Flashcards copied to clipboard.");
+                });
+            },
+
+            downloadCards() {
+                const element = document.createElement("a");
+                const file = new Blob([JSON.stringify(this.cards, null, 2)], { type: "application/json" });
+                element.href = URL.createObjectURL(file);
+                element.download = "my-flashcards.json";
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            },
+
+            showToast(title, msg, isError = false) {
+                this.dom.toastTitle.textContent = title;
+                this.dom.toastMsg.textContent = msg;
+                this.dom.toast.classList.add('show');
+                setTimeout(() => {
+                    this.dom.toast.classList.remove('show');
+                }, 3000);
+            },
+
+            render() {
+                this.dom.totalCards.textContent = this.cards.length;
+
+                if (this.cards.length === 0) {
+                    this.dom.grid.innerHTML = '';
+                    this.dom.emptyState.classList.remove('hidden');
+                    this.dom.actionsToolbar.classList.add('hidden');
+                } else {
+                    this.dom.emptyState.classList.add('hidden');
+                    this.dom.actionsToolbar.classList.remove('hidden');
+                    
+                    this.dom.grid.innerHTML = this.cards.map((card, index) => `
+                        <div class="group bg-white border border-border rounded-xl overflow-hidden shadow-premium-sm hover:shadow-premium-md hover:border-accent/30 transition-all duration-300 animate-slide-up">
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <span class="text-xs font-semibold text-accent bg-accent/5 px-2 py-1 rounded-md border border-accent/10">
+                                        Card ${index + 1}
+                                    </span>
+                                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onclick="app.editCard('${card.id}')" class="p-1.5 text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md transition-colors" title="Edit">
+                                            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="app.deleteCard('${card.id}')" class="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md transition-colors" title="Delete">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Front</h3>
+                                        <p class="text-primary font-medium leading-relaxed line-clamp-3">${this.escapeHtml(card.front)}</p>
+                                    </div>
+                                    <div class="w-full h-px bg-border/50"></div>
+                                    <div>
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Back</h3>
+                                        <p class="text-secondary-foreground leading-relaxed line-clamp-3">${this.escapeHtml(card.back)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    lucide.createIcons();
+                }
+            },
+
+            escapeHtml(unsafe) {
+                return unsafe
+                     .replace(/&/g, "&amp;")
+                     .replace(/</g, "&lt;")
+                     .replace(/>/g, "&gt;")
+                     .replace(/"/g, "&quot;")
+                     .replace(/'/g, "&#039;");
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
 </body>
 </html>
