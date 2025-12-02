@@ -1,108 +1,411 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reading Time Calculator | StudyTools</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Time Calculator - Study Suite</title>
+    <meta name="description" content="Calculate accurate reading times for your text with adjustable reading speeds.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-<style>
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #1b3c73, #5b9bd5);
-  color: white;
-}
-header {text-align:center;padding:48px 20px 12px;}
-header h1{margin:0;font-size:36px;font-weight:700;}
-header p{margin-top:8px;opacity:.95;}
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAFA',
+                        foreground: '#18181B',
+                        card: '#FFFFFF',
+                        'card-foreground': '#18181B',
+                        primary: '#18181B',
+                        'primary-foreground': '#FFFFFF',
+                        secondary: '#F4F4F5',
+                        'secondary-foreground': '#18181B',
+                        muted: '#F4F4F5',
+                        'muted-foreground': '#71717A',
+                        accent: '#4F46E5',
+                        'accent-foreground': '#FFFFFF',
+                        destructive: '#EF4444',
+                        border: '#E4E4E7',
+                        input: '#E4E4E7',
+                        ring: '#4F46E5',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                        'premium-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                        'premium-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                        'premium-hover': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-.container {
-  width: 92%;
-  max-width: 800px;
-  margin: 28px auto;
-  background: rgba(255,255,255,0.15);
-  padding: 28px;
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-}
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E4E4E7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1AA;
+        }
+        
+        .glass-header {
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+        }
 
-textarea {
-  width: 100%;
-  height: 200px;
-  padding: 14px;
-  border-radius: 12px;
-  outline: none;
-  border: none;
-  font-size: 15px;
-  margin-top: 12px;
-}
-
-button {
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  background: white;
-  color: #1b3c73;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: .3s;
-}
-button:hover {filter: brightness(0.95);}
-
-.result {
-  margin-top: 20px;
-  background: rgba(255,255,255,0.25);
-  padding: 20px;
-  border-radius: 12px;
-  color: #1b3c73;
-  font-weight: 600;
-  font-size: 17px;
-}
-</style>
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            color: #18181B;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #E4E4E7;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
 </head>
+<body class="bg-background text-foreground font-sans min-h-screen selection:bg-accent/10 selection:text-accent">
 
-<body>
+    <!-- Header -->
+    <header class="glass-header fixed top-0 left-0 right-0 z-50 h-20 flex items-center transition-all duration-300">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group cursor-pointer decoration-0">
+                <div class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <span class="font-heading text-xl font-bold tracking-tight text-primary">Study Suite</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Tools</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">About</a>
+            </nav>
+        </div>
+    </header>
 
-<header>
-  <h1>Reading Time Calculator</h1>
-  <p>Find out how long it will take to read any text.</p>
-</header>
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 container mx-auto px-6 max-w-5xl">
+        
+        <!-- Breadcrumb -->
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+        </div>
 
-<div class="container">
+        <div class="text-center mb-12 animate-slide-up">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6 border border-accent/20">
+                Premium Tools
+            </span>
+            <h1 class="font-heading text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-b from-primary to-zinc-600 bg-clip-text text-transparent pb-2">
+                Reading Time Calculator
+            </h1>
+            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Analyze your text to estimate accurate reading times based on different reading speeds.
+            </p>
+        </div>
 
-  <a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a>
+        <!-- Main Tool Area -->
+        <div class="grid lg:grid-cols-3 gap-8 animate-slide-up" style="animation-delay: 0.1s;">
+            
+            <!-- Input Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-card border border-border rounded-2xl shadow-premium-lg overflow-hidden">
+                    <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-muted-foreground"></i>
+                            <span class="text-sm font-medium text-secondary-foreground">Text Input</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="app.clearText()" class="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Clear text">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="text-input"
+                        class="w-full h-[400px] p-6 bg-background resize-none outline-none text-base leading-relaxed placeholder:text-muted-foreground/50"
+                        placeholder="Paste or type your text here to calculate reading time..."
+                    ></textarea>
+                    <div class="p-3 border-t border-border bg-secondary/10 flex justify-between items-center text-xs text-muted-foreground px-6">
+                         <span>Type or paste text above</span>
+                         <span id="status-indicator" class="opacity-0 transition-opacity text-accent font-medium">Calculating...</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <p class="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-3 h-3"></i>
+                        Reading time is calculated using the selected words-per-minute rate.
+                    </p>
+                </div>
+            </div>
 
-  <textarea id="textInput" placeholder="Paste your text here..."></textarea>
-  <button onclick="calculateTime()">Calculate Reading Time</button>
+            <!-- Results Column -->
+            <div class="space-y-6">
+                
+                <!-- Results Card -->
+                <div class="bg-card border border-border rounded-2xl shadow-premium-md p-6 sticky top-24">
+                    <h3 class="font-heading text-lg font-semibold mb-6 flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 text-accent"></i>
+                        Analysis
+                    </h3>
 
-  <div id="output" class="result" style="display:none;"></div>
+                    <!-- Main Time Display -->
+                    <div class="text-center mb-8 py-6 bg-accent/5 rounded-xl border border-accent/10">
+                        <div class="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">Estimated Time</div>
+                        <div id="reading-time-display" class="font-heading text-4xl font-bold text-primary">0 sec</div>
+                    </div>
 
-</div>
+                    <!-- Settings -->
+                    <div class="space-y-4 mb-8">
+                        <label class="text-sm font-medium text-secondary-foreground block">Reading Speed</label>
+                        <div class="relative">
+                            <select id="wpm-select" onchange="app.calculate()" class="w-full appearance-none bg-background border border-border text-foreground text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all shadow-sm cursor-pointer">
+                                <option value="150">Slow (150 wpm)</option>
+                                <option value="200" selected>Average (200 wpm)</option>
+                                <option value="250">Fast (250 wpm)</option>
+                                <option value="300">Very Fast (300 wpm)</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-muted-foreground">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
 
-<script>
-function calculateTime(){
-  const text = document.getElementById("textInput").value.trim();
-  if(!text){
-    alert("Please paste some text!");
-    return;
-  }
+                    <div class="w-full h-px bg-border mb-6"></div>
 
-  const words = text.split(/\s+/).length;
-  const minutes = words / 200; // avg reading speed
-  const readMin = Math.floor(minutes);
-  const readSec = Math.round((minutes - readMin)*60);
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-secondary/50 rounded-xl p-4 border border-border/50">
+                            <div class="text-xs text-muted-foreground mb-1">Words</div>
+                            <div id="word-count" class="text-xl font-bold text-primary">0</div>
+                        </div>
+                        <div class="bg-secondary/50 rounded-xl p-4 border border-border/50">
+                            <div class="text-xs text-muted-foreground mb-1">Characters</div>
+                            <div id="char-count" class="text-xl font-bold text-primary">0</div>
+                        </div>
+                    </div>
 
-  const output = document.getElementById("output");
-  output.style.display = "block";
-  output.innerHTML = `
-    <p>Total Words: <strong>${words}</strong></p>
-    <p>Estimated Reading Time: <strong>${readMin} min ${readSec} sec</strong></p>
-  `;
-}
-</script>
+                    <button onclick="app.copyResult()" class="w-full inline-flex items-center justify-center gap-2 bg-white border border-border text-secondary-foreground px-4 py-3 rounded-xl font-medium hover:bg-secondary hover:text-primary hover:border-accent/30 transition-all shadow-sm group">
+                        <i data-lucide="copy" class="w-4 h-4 group-hover:text-accent transition-colors"></i> 
+                        Copy Result
+                    </button>
 
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-white py-12">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <span class="font-heading font-bold text-lg">Study Suite</span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+                &copy; <span id="year"></span> Study Suite. Premium Tools for Students.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+        <div>
+            <h4 class="font-semibold text-sm" id="toast-title">Success</h4>
+            <p class="text-sm text-muted-foreground" id="toast-msg">Operation completed.</p>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            wpm: 200,
+            
+            init() {
+                this.cacheDOM();
+                this.bindEvents();
+                this.loadSavedText();
+                this.calculate(); // Initial calculation
+                document.getElementById('year').textContent = new Date().getFullYear();
+                lucide.createIcons();
+            },
+
+            cacheDOM() {
+                this.dom = {
+                    textInput: document.getElementById('text-input'),
+                    timeDisplay: document.getElementById('reading-time-display'),
+                    wordCount: document.getElementById('word-count'),
+                    charCount: document.getElementById('char-count'),
+                    wpmSelect: document.getElementById('wpm-select'),
+                    statusIndicator: document.getElementById('status-indicator'),
+                    toast: document.getElementById('toast'),
+                    toastTitle: document.getElementById('toast-title'),
+                    toastMsg: document.getElementById('toast-msg')
+                };
+            },
+
+            bindEvents() {
+                this.dom.textInput.addEventListener('input', () => {
+                    this.calculate();
+                    this.saveText();
+                    this.showStatus();
+                });
+
+                // Keyboard Shortcut for explicit calculation (Ctrl+Enter)
+                // Although it's auto-calculating, user might expect an action
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                         this.calculate();
+                         this.showToast("Updated", "Reading time recalculated.");
+                    }
+                });
+            },
+
+            loadSavedText() {
+                const saved = localStorage.getItem('study-suite-reading-time-text');
+                if (saved) {
+                    this.dom.textInput.value = saved;
+                }
+            },
+
+            saveText() {
+                localStorage.setItem('study-suite-reading-time-text', this.dom.textInput.value);
+            },
+
+            showStatus() {
+                this.dom.statusIndicator.classList.remove('opacity-0');
+                clearTimeout(this.statusTimeout);
+                this.statusTimeout = setTimeout(() => {
+                    this.dom.statusIndicator.classList.add('opacity-0');
+                }, 500);
+            },
+
+            calculate() {
+                const text = this.dom.textInput.value || "";
+                const wpm = parseInt(this.dom.wpmSelect.value);
+                
+                // Count words: split by whitespace and filter out empty strings
+                const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+                const wordCount = words.length;
+                const charCount = text.length;
+
+                // Calculate time
+                const totalSeconds = Math.ceil((wordCount / wpm) * 60);
+                
+                // Format time
+                let timeString = "0 sec";
+                if (wordCount > 0) {
+                    if (totalSeconds < 60) {
+                        timeString = `${totalSeconds} sec`;
+                    } else {
+                        const mins = Math.floor(totalSeconds / 60);
+                        const secs = totalSeconds % 60;
+                        timeString = secs > 0 ? `${mins} min ${secs} sec` : `${mins} min`;
+                    }
+                } else {
+                     timeString = "Start typing...";
+                }
+
+                // Update DOM
+                this.dom.wordCount.textContent = wordCount.toLocaleString();
+                this.dom.charCount.textContent = charCount.toLocaleString();
+                this.dom.timeDisplay.textContent = timeString;
+            },
+
+            clearText() {
+                if (this.dom.textInput.value.length > 0 && confirm("Clear all text?")) {
+                    this.dom.textInput.value = "";
+                    this.calculate();
+                    this.saveText();
+                    this.dom.textInput.focus();
+                    this.showToast("Cleared", "Text input has been cleared.");
+                }
+            },
+
+            copyResult() {
+                const time = this.dom.timeDisplay.textContent;
+                const words = this.dom.wordCount.textContent;
+                const wpm = this.dom.wpmSelect.options[this.dom.wpmSelect.selectedIndex].text;
+                
+                const resultText = `Reading Analysis:\nTime: ${time}\nWords: ${words}\nSpeed: ${wpm}`;
+                
+                navigator.clipboard.writeText(resultText).then(() => {
+                    this.showToast("Copied", "Analysis copied to clipboard.");
+                });
+            },
+
+            showToast(title, msg) {
+                this.dom.toastTitle.textContent = title;
+                this.dom.toastMsg.textContent = msg;
+                this.dom.toast.classList.add('show');
+                setTimeout(() => {
+                    this.dom.toast.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
 </body>
 </html>
