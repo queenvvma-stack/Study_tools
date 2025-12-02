@@ -1,289 +1,578 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Paraphraser | StudyTools</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg1: #1b3c73;
-    --bg2: #5b9bd5;
-    --card-bg: rgba(255,255,255,0.15);
-    --accent: #1b3c73;
-  }
-  html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:white}
-  header{padding:48px 20px 12px;text-align:center}
-  header h1{margin:0;font-size:36px;font-weight:700}
-  header p{margin-top:8px;opacity:0.95}
-  .container{width:92%;max-width:900px;margin:28px auto;background:var(--card-bg);padding:28px;border-radius:16px;backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,0.25)}
-  label{display:block;font-weight:600;margin-bottom:8px;color:#fff}
-  textarea{width:100%;min-height:180px;border-radius:12px;border:none;padding:14px;font-size:15px;resize:vertical;outline:none}
-  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;align-items:center}
-  select,input[type="range"]{padding:10px;border-radius:10px;border:none;font-size:14px}
-  .btn{background:#fff;color:var(--accent);border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
-  .btn:hover{filter:brightness(.98)}
-  .output{margin-top:18px;padding:16px;border-radius:12px;background:rgba(255,255,255,0.22);color:#0b2545;font-weight:600;white-space:pre-wrap;min-height:120px}
-  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:12px}
-  .small{font-size:13px;opacity:0.9;color:#fff}
-  .footer{margin-top:18px;text-align:center;font-size:13px;opacity:0.9}
-  .note{font-size:13px;color:#f7f7f7;opacity:0.95;margin-top:10px}
-  @media(max-width:560px){header h1{font-size:28px}.controls{flex-direction:column;align-items:stretch}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paraphraser Tool - Study Suite</title>
+    <meta name="description" content="Advanced paraphrasing tool to rewrite text with multiple modes for better clarity and uniqueness.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAFA',
+                        foreground: '#18181B',
+                        card: '#FFFFFF',
+                        'card-foreground': '#18181B',
+                        primary: '#18181B',
+                        'primary-foreground': '#FFFFFF',
+                        secondary: '#F4F4F5',
+                        'secondary-foreground': '#18181B',
+                        muted: '#F4F4F5',
+                        'muted-foreground': '#71717A',
+                        accent: '#4F46E5',
+                        'accent-foreground': '#FFFFFF',
+                        destructive: '#EF4444',
+                        border: '#E4E4E7',
+                        input: '#E4E4E7',
+                        ring: '#4F46E5',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                        'premium-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                        'premium-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                        'premium-hover': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E4E4E7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1AA;
+        }
+        
+        .glass-header {
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            color: #18181B;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #E4E4E7;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Mode Selection Active State */
+        .mode-btn.active {
+            background-color: #4F46E5;
+            color: white;
+            border-color: #4F46E5;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-background text-foreground font-sans min-h-screen selection:bg-accent/10 selection:text-accent">
 
-<header>
-  <h1>Paraphraser — Balanced Mode</h1>
-  <p>Rewrite text with better clarity — synonyms + light rewording (frontend only).</p>
-</header>
+    <!-- Header -->
+    <header class="glass-header fixed top-0 left-0 right-0 z-50 h-20 flex items-center transition-all duration-300">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group cursor-pointer decoration-0">
+                <div class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <span class="font-heading text-xl font-bold tracking-tight text-primary">Study Suite</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Tools</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">About</a>
+            </nav>
+        </div>
+    </header>
 
-<div class="container">
-  <div style="margin-bottom:10px"><a href="index.html" style="color:white;text-decoration:underline;font-weight:700">⬅ Back to Home</a></div>
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 container mx-auto px-6 max-w-5xl">
+        
+        <!-- Breadcrumb -->
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+        </div>
 
-  <label for="inputText">Paste your text here:</label>
-  <textarea id="inputText" placeholder="Paste paragraph(s) to paraphrase..."></textarea>
+        <div class="text-center mb-12 animate-slide-up">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6 border border-accent/20">
+                Premium Tools
+            </span>
+            <h1 class="font-heading text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-b from-primary to-zinc-600 bg-clip-text text-transparent pb-2">
+                Smart Paraphraser
+            </h1>
+            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Rewrite sentences and paragraphs to improve clarity, flow, and uniqueness using our advanced logic engine.
+            </p>
+        </div>
 
-  <div class="controls">
-    <div style="flex:1;min-width:200px">
-      <label for="strength" class="small">Strength (Synonyms ↔ Rewriting)</label>
-      <input id="strength" type="range" min="1" max="5" value="3" />
+        <!-- Tool Container -->
+        <div class="animate-slide-up" style="animation-delay: 0.1s;">
+            
+            <!-- Mode Selection -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="app.setMode('light')" id="mode-light" class="mode-btn active flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card font-medium transition-all hover:border-accent/50 hover:shadow-sm">
+                    <i data-lucide="feather" class="w-4 h-4"></i>
+                    Light
+                    <span class="ml-1 text-xs opacity-70 font-normal hidden md:inline">(Safe)</span>
+                </button>
+                <button onclick="app.setMode('medium')" id="mode-medium" class="mode-btn flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card font-medium transition-all hover:border-accent/50 hover:shadow-sm">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    Medium
+                    <span class="ml-1 text-xs opacity-70 font-normal hidden md:inline">(Balanced)</span>
+                </button>
+                <button onclick="app.setMode('strong')" id="mode-strong" class="mode-btn flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card font-medium transition-all hover:border-accent/50 hover:shadow-sm">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    Strong
+                    <span class="ml-1 text-xs opacity-70 font-normal hidden md:inline">(Creative)</span>
+                </button>
+            </div>
+
+            <!-- Editor Grid -->
+            <div class="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+                
+                <!-- Input Section -->
+                <div class="bg-card border border-border rounded-2xl shadow-premium-lg overflow-hidden flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-input" class="w-4 h-4 text-muted-foreground"></i>
+                            <span class="text-sm font-medium text-secondary-foreground">Original Text</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span id="input-counts">0 words</span>
+                            <button onclick="app.clearInput()" class="p-1.5 hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Clear">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="text-input"
+                        class="w-full flex-grow p-6 bg-background resize-none outline-none text-base leading-relaxed placeholder:text-muted-foreground/50 font-sans"
+                        placeholder="Paste your text here to paraphrase..."
+                    ></textarea>
+                </div>
+
+                <!-- Output Section -->
+                <div class="bg-card border border-border rounded-2xl shadow-premium-lg overflow-hidden flex flex-col h-[500px] relative">
+                    <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-check" class="w-4 h-4 text-accent"></i>
+                            <span class="text-sm font-medium text-secondary-foreground">Paraphrased Output</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span id="output-counts">0 words</span>
+                            <button onclick="app.copyOutput()" class="p-1.5 hover:text-accent hover:bg-accent/10 rounded-md transition-colors" title="Copy">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative flex-grow bg-secondary/10">
+                        <textarea 
+                            id="text-output"
+                            class="w-full h-full p-6 bg-transparent resize-none outline-none text-base leading-relaxed font-sans text-primary"
+                            placeholder="Paraphrased result will appear here..."
+                            readonly
+                        ></textarea>
+                        
+                        <!-- Loading Overlay -->
+                        <div id="loading-overlay" class="hidden absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+                            <div class="w-10 h-10 border-4 border-accent/20 border-t-accent rounded-full animate-spin mb-3"></div>
+                            <span class="text-sm font-medium text-accent animate-pulse">Rewriting...</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-center">
+                <button onclick="app.paraphrase()" class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-primary text-white px-12 py-4 rounded-xl font-semibold shadow-premium-md hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-premium-lg transition-all active:translate-y-0 active:shadow-sm text-lg">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    Paraphrase Now
+                </button>
+            </div>
+            
+            <div class="text-center mt-6 text-xs text-muted-foreground">
+                Press <kbd class="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-xs mx-1">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-xs mx-1">Enter</kbd> to rewrite instantly
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-white py-12">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <span class="font-heading font-bold text-lg">Study Suite</span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+                &copy; <span id="year"></span> Study Suite. Premium Tools for Students.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+        <div>
+            <h4 class="font-semibold text-sm" id="toast-title">Success</h4>
+            <p class="text-sm text-muted-foreground" id="toast-msg">Operation completed.</p>
+        </div>
     </div>
 
-    <div style="min-width:170px">
-      <label for="mode" class="small">Mode</label>
-      <select id="mode" aria-label="paraphrase mode">
-        <option value="balanced" selected>Balanced (Recommended)</option>
-        <option value="creative">Creative (more changes)</option>
-        <option value="conservative">Conservative (lighter)</option>
-      </select>
-    </div>
+    <script>
+        // --- Advanced Logic Engine ---
+        const Engine = {
+            synonyms: {
+                "important": ["crucial", "vital", "essential", "significant", "key", "pivotal"],
+                "use": ["utilize", "employ", "leverage", "apply", "harness"],
+                "make": ["create", "generate", "produce", "construct", "build", "form"],
+                "good": ["excellent", "beneficial", "favorable", "superior", "advantageous"],
+                "bad": ["detrimental", "adverse", "harmful", "negative", "unfavorable"],
+                "help": ["assist", "aid", "support", "facilitate", "benefit"],
+                "show": ["demonstrate", "illustrate", "reveal", "display", "exhibit"],
+                "think": ["believe", "consider", "regard", "deem", "perceive"],
+                "say": ["state", "declare", "mention", "remark", "assert", "articulate"],
+                "want": ["desire", "seek", "crave", "aspire", "wish"],
+                "need": ["require", "demand", "necessitate"],
+                "happy": ["content", "joyful", "pleased", "delighted", "satisfied"],
+                "sad": ["unhappy", "sorrowful", "melancholy", "depressed", "downcast"],
+                "fast": ["rapid", "quick", "swift", "speedy", "brisk"],
+                "slow": ["gradual", "leisurely", "sluggish", "unhurried"],
+                "big": ["large", "massive", "enormous", "substantial", "vast"],
+                "small": ["tiny", "minor", "insignificant", "slight", "diminutive"],
+                "start": ["begin", "commence", "initiate", "launch", "embark"],
+                "end": ["conclude", "finish", "terminate", "cease", "finalize"],
+                "change": ["alter", "modify", "transform", "adjust", "revise", "amend"],
+                "problem": ["issue", "challenge", "difficulty", "obstacle", "dilemma"],
+                "solution": ["resolution", "answer", "remedy", "fix"],
+                "idea": ["concept", "notion", "thought", "theory", "proposal"],
+                "many": ["numerous", "countless", "multiple", "various", "abundant"],
+                "different": ["distinct", "diverse", "varied", "dissimilar"],
+                "same": ["identical", "equivalent", "matching", "similar"],
+                "but": ["however", "nevertheless", "nonetheless", "yet", "conversely"],
+                "so": ["therefore", "thus", "consequently", "hence", "accordingly"],
+                "because": ["since", "as", "due to the fact that", "given that"],
+                "example": ["instance", "illustration", "case", "sample"],
+                "improve": ["enhance", "boost", "elevate", "refine", "optimize"],
+                "explain": ["clarify", "elucidate", "describe", "interpret"],
+                "find": ["discover", "uncover", "locate", "detect"],
+                "give": ["provide", "offer", "supply", "grant", "impart"],
+                "look": ["examine", "observe", "inspect", "view", "scan"],
+                "stop": ["halt", "discontinue", "pause", "prevent"],
+                "difficult": ["hard", "challenging", "complex", "arduous", "demanding"],
+                "easy": ["simple", "straightforward", "effortless", "uncomplicated"]
+            },
 
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="paraphraseBtn">Paraphrase</button>
-      <button class="btn" id="clearBtn" style="background:rgba(255,255,255,0.16);color:#fff">Clear</button>
-    </div>
-  </div>
+            phrases: {
+                "due to the fact that": "because",
+                "in addition to": "besides",
+                "in order to": "to",
+                "a large number of": "many",
+                "at this point in time": "now",
+                "in the event that": "if",
+                "with the exception of": "except",
+                "make a decision": "decide",
+                "take into consideration": "consider",
+                "give an indication of": "indicate",
+                "put an end to": "stop",
+                "come to a conclusion": "conclude",
+                "for the purpose of": "for",
+                "with regard to": "regarding",
+                "in spite of the fact that": "although"
+            },
 
-  <div class="meta">
-    <div class="small">Tip: Increase Strength for bolder rewrites. Use "Conservative" to keep original meaning closely.</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="copyBtn" style="background:#fff;color:var(--accent)">Copy</button>
-      <button class="btn" id="downloadBtn" style="background:#fff;color:var(--accent)">Download</button>
-    </div>
-  </div>
+            stopwords: new Set([
+                "the", "a", "an", "and", "or", "of", "to", "in", "on", "at", "by", "for", "with", "is", "are", "was", "were", "be", "been", "being", "it", "this", "that", "these", "those", "i", "you", "he", "she", "we", "they", "my", "your", "his", "her", "our", "their"
+            ]),
 
-  <div class="output" id="outputBox">Paraphrased text will appear here...</div>
+            replacePhrases(text) {
+                let result = text;
+                for (const [phrase, replacement] of Object.entries(this.phrases)) {
+                    const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
+                    result = result.replace(regex, replacement);
+                }
+                return result;
+            },
 
-  <div class="note">
-    How this works: the tool uses a local synonym dictionary plus light clause reordering and simple sentence transforms.
-    It’s not an AI — but it improves wording fast without any server or cost.
-  </div>
+            getSynonym(word, mode) {
+                const lowerWord = word.toLowerCase();
+                if (this.stopwords.has(lowerWord)) return word; // Protect stopwords
+                
+                const possibilities = this.synonyms[lowerWord];
+                if (!possibilities) return word;
 
-  <div class="footer">Made for StudyTools • Frontend-only paraphrasing</div>
-</div>
+                // Mode Logic
+                let chance = 0;
+                if (mode === 'light') chance = 0.3;
+                if (mode === 'medium') chance = 0.6;
+                if (mode === 'strong') chance = 0.9;
 
-<script>
-/*
- Balanced Paraphraser (frontend only)
- - Uses a synonyms map + simple transforms
- - Strength (1..5) controls how many replacements & reorders happen
- - Mode offers minor behavior tweaks: conservative/balanced/creative
-*/
+                if (Math.random() > chance) return word;
 
-// small synonym dictionary (expandable)
-const SYNONYMS = {
-  "important":["crucial","vital","significant"],
-  "use":["utilize","employ","apply"],
-  "help":["assist","aid","support"],
-  "show":["display","demonstrate","reveal"],
-  "change":["modify","alter","transform"],
-  "good":["beneficial","useful","effective"],
-  "bad":["poor","undesirable","harmful"],
-  "problem":["issue","challenge","difficulty"],
-  "many":["numerous","several","a lot of"],
-  "increase":["rise","grow","expand"],
-  "decrease":["reduce","diminish","lower"],
-  "fast":["quickly","rapidly","swiftly"],
-  "slow":["gradually","slowly","lethargically"],
-  "difficult":["challenging","tough","complex"],
-  "easy":["simple","straightforward","effortless"],
-  "learn":["study","understand","grasp"],
-  "make":["create","produce","form"],
-  "example":["instance","illustration","sample"],
-  "explain":["clarify","describe","elucidate"],
-  "reason":["cause","basis","explanation"],
-  "result":["outcome","consequence","effect"],
-  "start":["begin","commence","initiate"],
-  "finish":["end","complete","conclude"]
-};
+                // Pick a random synonym
+                const synonym = possibilities[Math.floor(Math.random() * possibilities.length)];
+                
+                // Match capitalization
+                if (word[0] === word[0].toUpperCase()) {
+                    return synonym.charAt(0).toUpperCase() + synonym.slice(1);
+                }
+                return synonym;
+            },
 
-// helper: pick random element
-function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+            restructureSentence(sentence, mode) {
+                // Simple passive/active or clause swapping logic could go here
+                // For strong mode, we can try to flip clauses if a comma exists
+                if (mode === 'strong' && sentence.includes(',') && sentence.length > 20) {
+                    const parts = sentence.split(',');
+                    if (parts.length === 2) {
+                        // Very basic swap: "Because it rained, I stayed home" -> "I stayed home because it rained"
+                        // This is risky without NLP, so we only do it occasionally
+                        if (Math.random() > 0.7) {
+                            // Only swap if it looks safe (no complex nesting)
+                            const p1 = parts[0].trim();
+                            const p2 = parts[1].trim();
+                            // Fix capitalization roughly
+                            const p1Fixed = p1.charAt(0).toLowerCase() + p1.slice(1);
+                            const p2Fixed = p2.charAt(0).toUpperCase() + p2.slice(1);
+                            return `${p2Fixed} ${p1Fixed}`;
+                        }
+                    }
+                }
+                return sentence;
+            },
 
-// split text into sentences (simple)
-function splitSentences(text){
-  // keep punctuation, split on .!? but keep them
-  const parts = text.match(/[^.!?]+[.!?]?/g) || [];
-  return parts.map(s => s.trim()).filter(Boolean);
-}
+            process(text, mode) {
+                // 1. Phrase replacement
+                let processed = this.replacePhrases(text);
 
-// basic tokenizer keeping punctuation
-function tokenizeWords(sentence){
-  // match words and punctuation
-  return sentence.match(/[\w'’\-]+|[.,!?;:()"]/g) || [];
-}
+                // 2. Split into sentences to handle structure
+                // Regex looks for punctuation followed by space or end of string
+                const sentences = processed.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [processed];
 
-// replace with synonyms based on strength & mode
-function replaceSynonyms(tokens, strength, mode){
-  return tokens.map(t=>{
-    const lower = t.toLowerCase();
-    if(SYNONYMS[lower] && Math.random() < (0.25 * strength)){ // probability increases with strength
-      let choice = rnd(SYNONYMS[lower]);
-      // match capitalization
-      if(t[0] === t[0].toUpperCase()){
-        choice = choice.charAt(0).toUpperCase() + choice.slice(1);
-      }
-      return choice;
-    }
-    // minor morphological tweaks for creative mode
-    if(mode === 'creative' && Math.random() < 0.03 * strength){
-      // sometimes join words or split (very light)
-      return t.split('').reverse().join(''); // fallback - very rare (won't look good often)
-    }
-    return t;
-  });
-}
+                const finalSentences = sentences.map(sentence => {
+                    let s = sentence.trim();
+                    
+                    // 3. Restructure (Strong mode only)
+                    s = this.restructureSentence(s, mode);
 
-// light sentence reordering for clauses split by comma/semicolon
-function maybeReorderSentence(sentence, strength, mode){
-  if(sentence.includes(',') || sentence.includes(';')){
-    const clauses = sentence.split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
-    if(clauses.length>1 && Math.random() < 0.15 * strength){
-      // reverse order sometimes, or rotate
-      if(Math.random() < 0.5) clauses.reverse();
-      else {
-        // rotate by 1
-        clauses.push(clauses.shift());
-      }
-      // join with comma
-      let endPunc = sentence.match(/[.!?]$/) ? sentence.match(/[.!?]$/)[0] : '';
-      return clauses.join(', ') + endPunc;
-    }
-  }
-  return sentence;
-}
+                    // 4. Word-level replacement
+                    // Split by word boundaries but keep punctuation
+                    const tokens = s.split(/(\b|\W+)/);
+                    
+                    const newTokens = tokens.map(token => {
+                        // Only replace actual words
+                        if (/\w+/.test(token) && !/\d+/.test(token)) {
+                            return this.getSynonym(token, mode);
+                        }
+                        return token;
+                    });
+                    
+                    return newTokens.join('');
+                });
 
-// simple cleanup: avoid reversed-character artifacts from creative token change
-function cleanupToken(tok){
-  // if token looks reversed letters, revert to original pattern (very safe)
-  if(/^[A-Za-z]{2,}$/.test(tok) && tok === tok.split('').reverse().join('')){
-    // return tok as-is (rare)
-    return tok;
-  }
-  return tok;
-}
+                return finalSentences.join(' ');
+            }
+        };
 
-function paraphraseText(input, strength = 3, mode = 'balanced'){
-  const sents = splitSentences(input);
-  const outSents = [];
+        // --- App Logic ---
+        const app = {
+            mode: 'medium',
 
-  sents.forEach(sent=>{
-    // 1) maybe reorder clauses first
-    let s = maybeReorderSentence(sent, strength, mode);
+            init() {
+                this.cacheDOM();
+                this.bindEvents();
+                this.loadSavedInput();
+                this.updateCounts();
+                document.getElementById('year').textContent = new Date().getFullYear();
+                lucide.createIcons();
+            },
 
-    // 2) tokenize
-    const tokens = tokenizeWords(s);
+            cacheDOM() {
+                this.dom = {
+                    input: document.getElementById('text-input'),
+                    output: document.getElementById('text-output'),
+                    loading: document.getElementById('loading-overlay'),
+                    inputCounts: document.getElementById('input-counts'),
+                    outputCounts: document.getElementById('output-counts'),
+                    toast: document.getElementById('toast'),
+                    toastTitle: document.getElementById('toast-title'),
+                    toastMsg: document.getElementById('toast-msg')
+                };
+            },
 
-    // 3) synonym replacement
-    const replaced = replaceSynonyms(tokens, strength, mode).map(cleanupToken);
+            bindEvents() {
+                this.dom.input.addEventListener('input', () => {
+                    this.saveInput();
+                    this.updateCounts();
+                });
 
-    // 4) reconstruct sentence carefully: join tokens with spaces, then fix spacing before punctuation
-    let recon = replaced.join(' ');
-    // common fixes: "word , " -> "word,"  and "word ." -> "word."
-    recon = recon.replace(/\s+([.,!?;:)])/g, '$1');
-    recon = recon.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        this.paraphrase();
+                    }
+                });
+            },
 
-    // 5) sometimes split long sentences into two shorter ones in creative/balanced modes
-    if(mode !== 'conservative' && recon.length > 220 && Math.random() < 0.25 * (strength/3)){
-      // find comma position to split
-      const idx = recon.indexOf(',');
-      if(idx > 50){
-        const a = recon.slice(0, idx);
-        const b = recon.slice(idx+1).trim();
-        recon = a.trim() + '. ' + b.charAt(0).toUpperCase() + b.slice(1);
-      }
-    }
+            setMode(newMode) {
+                this.mode = newMode;
+                // Update UI
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(`mode-${newMode}`).classList.add('active');
+                this.showToast("Mode Changed", `Paraphrasing mode set to ${newMode}.`);
+            },
 
-    // 6) small final punctuation fix
-    if(!/[.!?]$/.test(recon)) recon = recon + '.';
+            loadSavedInput() {
+                const saved = localStorage.getItem('study-suite-paraphraser-input');
+                if (saved) {
+                    this.dom.input.value = saved;
+                }
+            },
 
-    outSents.push(recon);
-  });
+            saveInput() {
+                localStorage.setItem('study-suite-paraphraser-input', this.dom.input.value);
+            },
 
-  // join sentences and final cleanup (avoid double spaces)
-  let output = outSents.join(' ');
-  output = output.replace(/\s{2,}/g,' ').trim();
+            updateCounts() {
+                const inText = this.dom.input.value.trim();
+                const outText = this.dom.output.value.trim();
+                
+                const count = (t) => t.length === 0 ? 0 : t.split(/\s+/).length;
+                
+                this.dom.inputCounts.textContent = `${count(inText)} words`;
+                this.dom.outputCounts.textContent = `${count(outText)} words`;
+            },
 
-  return output;
-}
+            clearInput() {
+                if (confirm("Clear original text?")) {
+                    this.dom.input.value = "";
+                    this.dom.output.value = "";
+                    this.saveInput();
+                    this.updateCounts();
+                    this.dom.input.focus();
+                }
+            },
 
-// UI bindings
-const inputEl = document.getElementById('inputText');
-const outputEl = document.getElementById('outputBox');
-const btn = document.getElementById('paraphraseBtn');
-const clearBtn = document.getElementById('clearBtn');
-const copyBtn = document.getElementById('copyBtn');
-const downloadBtn = document.getElementById('downloadBtn');
+            copyOutput() {
+                if (!this.dom.output.value) return;
+                navigator.clipboard.writeText(this.dom.output.value).then(() => {
+                    this.showToast("Copied", "Paraphrased text copied to clipboard.");
+                });
+            },
 
-btn.addEventListener('click', ()=>{
-  const text = inputEl.value.trim();
-  if(!text){
-    outputEl.textContent = '⚠️ Paste some text first!';
-    return;
-  }
-  let strength = parseInt(document.getElementById('strength').value,10) || 3;
-  const mode = document.getElementById('mode').value || 'balanced';
+            paraphrase() {
+                const text = this.dom.input.value.trim();
+                if (!text) {
+                    this.showToast("Error", "Please enter some text to paraphrase.", true);
+                    return;
+                }
 
-  // map range 1..5 to internal strength factor (1 weak .. 5 strong)
-  const result = paraphraseText(text, strength, mode);
-  outputEl.textContent = result;
-});
+                // Show loading
+                this.dom.loading.classList.remove('hidden');
+                
+                // Simulate processing delay for "premium feel"
+                setTimeout(() => {
+                    const result = Engine.process(text, this.mode);
+                    this.dom.output.value = result;
+                    this.dom.loading.classList.add('hidden');
+                    this.updateCounts();
+                    this.showToast("Success", "Text paraphrased successfully.");
+                }, 800); // 800ms delay
+            },
 
-clearBtn.addEventListener('click', ()=>{
-  inputEl.value = '';
-  outputEl.textContent = 'Paraphrased text will appear here...';
-});
+            showToast(title, msg, isError = false) {
+                this.dom.toastTitle.textContent = title;
+                this.dom.toastMsg.textContent = msg;
+                this.dom.toast.classList.add('show');
+                
+                // Reset icon color if needed
+                const icon = this.dom.toast.querySelector('i');
+                if (isError) {
+                    icon.setAttribute('data-lucide', 'alert-circle');
+                    icon.classList.replace('text-green-500', 'text-red-500');
+                } else {
+                    icon.setAttribute('data-lucide', 'check-circle');
+                    icon.classList.replace('text-red-500', 'text-green-500');
+                }
+                lucide.createIcons();
 
-copyBtn.addEventListener('click', ()=>{
-  const txt = outputEl.textContent;
-  if(!txt || txt.startsWith('⚠️')) return;
-  navigator.clipboard.writeText(txt).then(()=> {
-    copyBtn.textContent = 'Copied ✓';
-    setTimeout(()=> copyBtn.textContent = 'Copy',1200);
-  }).catch(()=> {
-    copyBtn.textContent = 'Copy';
-  });
-});
+                setTimeout(() => {
+                    this.dom.toast.classList.remove('show');
+                }, 3000);
+            }
+        };
 
-downloadBtn.addEventListener('click', ()=>{
-  const txt = outputEl.textContent;
-  if(!txt || txt.startsWith('⚠️')) return;
-  const blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'paraphrased.txt';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-});
-
-// keyboard shortcut: Ctrl+Enter to paraphrase
-inputEl.addEventListener('keydown', (e)=>{
-  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-    btn.click();
-  }
-});
-</script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
+    
