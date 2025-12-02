@@ -1,363 +1,1350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>StudyTools — Smart Summarizer</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg1:#0059ff; --bg2:#00b7ff; --card:rgba(255,255,255,0.96);
-    --accent:#0059ff; --muted:#6b7280;
-  }
-  html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#f3f6ff 0%, #f9fbff 100%);color:#0b1220}
-  .page {max-width:1000px;margin:28px auto;padding:20px}
-  header {text-align:center;margin-bottom:18px}
-  header h1{margin:0;font-size:28px;color:var(--accent)}
-  header p{margin-top:8px;color:var(--muted)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Text Summarizer - Instant AI-Free Text Summaries</title>
+  <meta name="description" content="Summarize any text instantly with our smart extractive algorithm. No API keys needed - works entirely in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 30px rgba(10,20,60,0.06)}
-  .row{display:flex;gap:12px;align-items:center}
-  .col{flex:1}
+    :root {
+      --background: #ffffff;
+      --foreground: #171717;
+      --card: #fafafa;
+      --card-foreground: #171717;
+      --border: #e5e5e5;
+      --input: #e5e5e5;
+      --primary: #3b82f6;
+      --primary-foreground: #ffffff;
+      --secondary: #f5f5f5;
+      --secondary-foreground: #171717;
+      --muted: #f5f5f5;
+      --muted-foreground: #737373;
+      --accent: #f5f5f5;
+      --accent-foreground: #171717;
+      --destructive: #ef4444;
+      --ring: #3b82f6;
+      --radius: 0.5rem;
+    }
 
-  label.small{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #121212;
+        --foreground: #fafafa;
+        --card: #171717;
+        --card-foreground: #fafafa;
+        --border: #262626;
+        --input: #262626;
+        --primary: #3b82f6;
+        --primary-foreground: #ffffff;
+        --secondary: #262626;
+        --secondary-foreground: #fafafa;
+        --muted: #262626;
+        --muted-foreground: #a3a3a3;
+        --accent: #262626;
+        --accent-foreground: #fafafa;
+        --destructive: #ef4444;
+        --ring: #3b82f6;
+      }
+    }
 
-  textarea#inputText{
-    width:100%;min-height:220px;border-radius:10px;border:1px solid #e6eefc;padding:14px;font-size:15px;outline:none;resize:vertical;
-    box-shadow:inset 0 1px 0 rgba(0,0,0,0.02);
-  }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .btn{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
-  .btn.ghost{background:transparent;border:1px solid #e6eefc;color:var(--accent)}
-  .btn.secondary{background:#f3f5ff;color:var(--accent);border:1px solid #dfeaff}
-  .btn.small{padding:8px 10px;font-size:14px}
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--border);
+      background-color: var(--background);
+      backdrop-filter: blur(8px);
+    }
 
-  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font-size:13px;gap:12px;flex-wrap:wrap}
+    .header-content {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
 
-  .options{display:flex;gap:10px;align-items:center}
-  .select, .radio {padding:8px 10px;border-radius:8px;border:1px solid #e6eefc;background:white}
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
 
-  .output-area{margin-top:18px}
-  .output-box{background:#fff;border-radius:10px;padding:16px;border:1px solid #e9f0ff;min-height:120px;white-space:pre-wrap;color:#0b1220}
-  .controls-bottom{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius);
+      border: none;
+      background: transparent;
+      color: var(--foreground);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
 
-  .chips{display:flex;gap:8px}
-  .chip{background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:600;border:1px solid #dfeaff;font-size:13px}
+    .back-btn:hover {
+      background-color: var(--muted);
+    }
 
-  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
 
-  .flex-between{display:flex;justify-content:space-between;align-items:center}
-  a.back{color:var(--muted);text-decoration:underline;font-size:14px}
+    .logo-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius);
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  /* responsive */
-  @media(max-width:720px){
-    .row{flex-direction:column}
-    .controls-bottom{justify-content:stretch}
-  }
+    .logo-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--primary-foreground);
+    }
 
-  /* spinner */
-  .spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(0,0,0,0.08);border-top-color:var(--accent);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
-  @keyframes spin{to{transform:rotate(360deg)}}
+    .logo-text h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
 
-</style>
+    .logo-text p {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .logo-text p {
+        display: block;
+      }
+    }
+
+    .keyboard-hint {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+      background-color: var(--muted);
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .keyboard-hint {
+        display: block;
+      }
+    }
+
+    .keyboard-hint kbd {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.75rem;
+    }
+
+    /* Main */
+    main {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .control-panel {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-foreground);
+    }
+
+    .button-group {
+      display: flex;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--foreground);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background-color: var(--muted);
+    }
+
+    .btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn.active:hover {
+      background-color: var(--primary);
+      opacity: 0.9;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.5rem;
+      min-width: 8rem;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      background-color: var(--primary);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-radius: var(--radius);
+    }
+
+    .btn-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 0;
+      border-radius: var(--radius);
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Section */
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-foreground);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    .badge-success {
+      background-color: rgba(34, 197, 94, 0.1);
+      color: #16a34a;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .badge-success {
+        background-color: rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+      }
+    }
+
+    .section-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Card */
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+
+    .card.focused {
+      box-shadow: 0 0 0 2px var(--ring);
+    }
+
+    .card.error {
+      box-shadow: 0 0 0 2px var(--destructive);
+    }
+
+    /* Textarea */
+    .textarea-wrapper {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 16rem;
+      padding: 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--foreground);
+      background: transparent;
+      border: none;
+      resize: none;
+      outline: none;
+    }
+
+    @media (min-width: 768px) {
+      textarea {
+        min-height: 20rem;
+      }
+    }
+
+    textarea::placeholder {
+      color: var(--muted-foreground);
+    }
+
+    /* Output */
+    .output-card {
+      min-height: 16rem;
+      padding: 1rem;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .output-card {
+        min-height: 20rem;
+      }
+    }
+
+    .output-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 14rem;
+      text-align: center;
+      color: var(--muted-foreground);
+      gap: 1rem;
+    }
+
+    .empty-icon {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 9999px;
+      background-color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon svg {
+      width: 2rem;
+      height: 2rem;
+      opacity: 0.5;
+    }
+
+    .empty-state p:first-of-type {
+      font-weight: 500;
+    }
+
+    .empty-state p:last-of-type {
+      font-size: 0.875rem;
+    }
+
+    /* Loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--muted) 25%, var(--secondary) 50%, var(--muted) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius);
+      height: 1rem;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Footer */
+    .section-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .char-count {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      transition: color 0.2s;
+    }
+
+    .char-count.warning {
+      color: #ca8a04;
+    }
+
+    .char-count.error {
+      color: var(--destructive);
+      font-weight: 500;
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--destructive);
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.25rem;
+      min-width: 12rem;
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-0.5rem);
+      transition: all 0.2s;
+    }
+
+    .dropdown.open .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: var(--foreground);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--muted);
+    }
+
+    .dropdown-item:first-child {
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .dropdown-item:last-child {
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 100;
+    }
+
+    .toast {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: translateY(0.5rem);
+      }
+    }
+
+    .toast-title {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .toast-description {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+
+    /* Tooltip */
+    .tooltip-container {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 0.5rem;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background-color: var(--foreground);
+      color: var(--background);
+      border-radius: var(--radius);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+      pointer-events: none;
+    }
+
+    .tooltip-container:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Page Footer */
+    .page-footer {
+      text-align: center;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Icons */
+    svg {
+      flex-shrink: 0;
+    }
+
+    /* Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* Focus styles */
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <h1>Smart Summarizer</h1>
-      <p>Better summaries without any API — fast, private, and completely in your browser.</p>
-    </header>
-
-    <div class="card">
-      <div class="flex-between" style="margin-bottom:12px">
-        <div style="display:flex;gap:12px;align-items:center">
-          <a class="back" href="index.html">⬅ Back to Home</a>
-          <div class="chips">
-            <div class="chip">Frontend-only</div>
-            <div class="chip">No API key</div>
-            <div class="chip">Private</div>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="back-btn" onclick="history.back()" aria-label="Go back" data-testid="button-back-home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="logo-container">
+          <div class="logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1 data-testid="text-page-title">Text Summarizer</h1>
+            <p>Extract key points from any text</p>
           </div>
         </div>
-
-        <div style="text-align:right">
-          <div style="font-size:13px;color:var(--muted)">Tip: Press <strong>Ctrl/Cmd + Enter</strong> to summarize</div>
-        </div>
       </div>
-
-      <label class="small">Paste or type your study content</label>
-      <textarea id="inputText" placeholder="Paste lecture notes, textbook paragraphs, or long study text..."></textarea>
-
-      <div class="meta">
-        <div id="counts" style="color:var(--muted)">Words: 0 • Characters: 0</div>
-
-        <div class="options" aria-hidden="false">
-          <select id="length" class="select" title="Summary length">
-            <option value="short">Short (1–2 lines)</option>
-            <option value="medium" selected>Medium (3–4 lines)</option>
-            <option value="long">Long (5–8 lines)</option>
-          </select>
-
-          <select id="mode" class="select" title="Output mode">
-            <option value="paragraph" selected>Paragraph</option>
-            <option value="bullets">Bulleted Points</option>
-          </select>
-
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)">
-            <input type="checkbox" id="keepOrder" /> Keep sentence order
-          </label>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button class="btn" id="summarizeBtn">Summarize</button>
-        <button class="btn ghost" id="sampleBtn">Try Sample Text</button>
-        <button class="btn secondary" id="clearBtn">Clear</button>
-      </div>
-
-      <div class="output-area">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:700">Summary</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn small" id="copyBtn">Copy</button>
-            <button class="btn small ghost" id="downloadBtn">Download</button>
-            <div id="status" style="font-size:13px;color:var(--muted)"></div>
-          </div>
-        </div>
-
-        <div class="output-box" id="outputBox">Your summary will appear here after clicking <strong>Summarize</strong>.</div>
-
-        <div class="controls-bottom">
-          <div class="hint">Use the length and mode options to control summary size & format.</div>
-        </div>
+      <div class="keyboard-hint">
+        <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
       </div>
     </div>
-  </div>
+  </header>
 
-<script>
-/* Smart Extractive Summarizer — frontend only
-   Strategy:
-   1) Clean input (normalize whitespace & punctuation).
-   2) Split into sentences.
-   3) Build a simple term-frequency score for words (without stopwords).
-   4) Score sentences by sum of word scores + position bonus + length penalty.
-   5) Pick top N sentences depending on chosen length.
-   6) Optionally keep original order.
-   7) Minor post-processing to fix punctuation and spacing.
-*/
+  <!-- Main Content -->
+  <main>
+    <div class="content">
+      <!-- Control Panel -->
+      <div class="control-panel">
+        <div class="control-group">
+          <span class="control-label">Summary Length</span>
+          <div class="button-group" role="group" aria-label="Summary length">
+            <button class="btn active" data-length="short" data-testid="button-length-short">Short</button>
+            <button class="btn" data-length="medium" data-testid="button-length-medium">Medium</button>
+            <button class="btn" data-length="long" data-testid="button-length-long">Long</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <span class="control-label">Output Format</span>
+          <div class="button-group" role="group" aria-label="Output format">
+            <button class="btn active" data-format="paragraph" data-testid="button-format-paragraph">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="21" y1="6" x2="3" y2="6"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+                <line x1="17" y1="18" x2="3" y2="18"/>
+              </svg>
+              <span class="btn-text">Paragraph</span>
+            </button>
+            <button class="btn" data-format="bullet" data-testid="button-format-bullet">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              <span class="btn-text">Bullets</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-const STOPWORDS = new Set([
-  "the","is","in","and","to","of","a","that","it","on","for","as","are","with","was","were","be","by","this","an","or","from","at","which","but","has","have","had","not","they","their","its","can","will","would","should","may","if","we","you","your","i","he","she","them"
-]);
+      <!-- Grid -->
+      <div class="grid">
+        <!-- Input Section -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-header-left">
+              <span class="section-label">Enter Text</span>
+              <span class="badge" id="wordCount" data-testid="badge-word-count">0 words</span>
+            </div>
+            <div class="dropdown" id="sampleDropdown">
+              <button class="btn btn-ghost" onclick="toggleDropdown()" data-testid="button-load-sample">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                </svg>
+                <span>Load Sample</span>
+              </button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" onclick="loadSample(0)" data-testid="menu-item-sample-0">Climate Change</button>
+                <button class="dropdown-item" onclick="loadSample(1)" data-testid="menu-item-sample-1">Artificial Intelligence</button>
+                <button class="dropdown-item" onclick="loadSample(2)" data-testid="menu-item-sample-2">Space Exploration</button>
+              </div>
+            </div>
+          </div>
 
-const inputEl = document.getElementById('inputText');
-const summarizeBtn = document.getElementById('summarizeBtn');
-const sampleBtn = document.getElementById('sampleBtn');
-const clearBtn = document.getElementById('clearBtn');
-const lengthSelect = document.getElementById('length');
-const modeSelect = document.getElementById('mode');
-const outputBox = document.getElementById('outputBox');
-const copyBtn = document.getElementById('copyBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const counts = document.getElementById('counts');
-const status = document.getElementById('status');
-const keepOrderChk = document.getElementById('keepOrder');
+          <div class="card" id="inputCard">
+            <div class="textarea-wrapper">
+              <textarea 
+                id="inputText" 
+                placeholder="Paste your text here to generate a summary..."
+                data-testid="input-text"
+              ></textarea>
+            </div>
+          </div>
 
-let lastSummary = '';
+          <div class="section-footer">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span class="char-count" id="charCount" data-testid="text-char-count">0 / 10,000 characters</span>
+              <span class="error-message" id="errorMessage" style="display: none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span>Limit exceeded</span>
+              </span>
+            </div>
+            <div class="tooltip-container">
+              <button class="btn btn-primary" id="summarizeBtn" onclick="summarize()" data-testid="button-summarize">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                </svg>
+                <span id="summarizeBtnText">Summarize</span>
+              </button>
+              <span class="tooltip">Generate summary (Ctrl/Cmd + Enter)</span>
+            </div>
+          </div>
+        </div>
 
-/* Helpers */
-function updateCounts(){
-  const text = inputEl.value.trim();
-  const words = text ? text.split(/\s+/).length : 0;
-  const chars = text.length;
-  counts.textContent = `Words: ${words} • Characters: ${chars}`;
-}
-inputEl.addEventListener('input', updateCounts);
+        <!-- Output Section -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-header-left">
+              <span class="section-label">Summary</span>
+              <span class="badge" id="summaryWordCount" style="display: none;" data-testid="badge-summary-word-count">0 words</span>
+              <span class="badge badge-success" id="reductionBadge" style="display: none;" data-testid="badge-reduction">0% shorter</span>
+            </div>
+            <div class="section-header-right" id="actionButtons" style="display: none;">
+              <div class="tooltip-container">
+                <button class="btn btn-ghost btn-icon" onclick="copyToClipboard()" data-testid="button-copy" aria-label="Copy to clipboard">
+                  <svg id="copyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  <svg id="checkIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+                <span class="tooltip">Copy to clipboard</span>
+              </div>
+              <div class="tooltip-container">
+                <button class="btn btn-ghost btn-icon" onclick="downloadSummary()" data-testid="button-download" aria-label="Download as text file">
+                  <svg id="downloadIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <svg id="downloadCheckIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+                <span class="tooltip">Download as .txt</span>
+              </div>
+            </div>
+          </div>
 
-function cleanText(text){
-  // normalize spaces and fix weird punctuation spacing
-  let t = text.replace(/\r\n/g, '\n').replace(/\t/g,' ').replace(/\u00A0/g,' ');
-  t = t.replace(/\s{2,}/g,' ').trim();
-  // ensure sentences end with punctuation
-  t = t.replace(/([a-z0-9])\n([A-Z])/g, '$1. $2');
-  return t;
-}
+          <div class="card output-card" id="outputCard">
+            <div id="outputContent">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                  </svg>
+                </div>
+                <p>Your summary will appear here</p>
+                <p>Enter text on the left and click Summarize</p>
+              </div>
+            </div>
+          </div>
 
-function splitSentences(text){
-  // this regex captures sentence endings but keeps abbreviations safe in basic cases
-  const raw = text.match(/[^.!?]+[.!?]*/g) || [];
-  return raw.map(s=>s.trim()).filter(Boolean);
-}
+          <div id="summaryCharCount" class="char-count" style="display: none;" data-testid="text-summary-char-count">0 characters</div>
+        </div>
+      </div>
 
-function tokenize(text){
-  return text.toLowerCase().match(/\b[^\s,.!?;:()]+\b/g) || [];
-}
+      <!-- Footer -->
+      <div class="page-footer">
+        <p>This summarizer uses an extractive algorithm that analyzes sentence importance based on term frequency, position, and length. All processing happens in your browser.</p>
+      </div>
+    </div>
+  </main>
 
-function buildWordScores(sentences){
-  const freq = Object.create(null);
-  let maxFreq = 0;
-  sentences.forEach(s=>{
-    const tokens = tokenize(s).filter(w=>!STOPWORDS.has(w));
-    tokens.forEach(w=>{
-      freq[w] = (freq[w] || 0) + 1;
-      if(freq[w] > maxFreq) maxFreq = freq[w];
-    });
-  });
-  // normalize
-  Object.keys(freq).forEach(k=> freq[k] = freq[k] / maxFreq );
-  return freq;
-}
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-function scoreSentences(sentences, wordScores){
-  const scores = [];
-  sentences.forEach((s, idx)=>{
-    const tokens = tokenize(s);
-    let score = 0;
-    tokens.forEach(w=>{
-      if(wordScores[w]) score += wordScores[w];
-    });
-    // position bonus: first and last sentences slightly more important
-    const posBonus = (idx === 0 || idx === sentences.length-1) ? 0.15 : 0;
-    // length penalty: extremely short sentences are less informative
-    const len = tokens.length;
-    const lengthFactor = Math.min(1, len / 20); // 20 words is good
-    score = score * lengthFactor + posBonus;
-    // small boost for sentences with proper nouns (capitalized words)
-    if(/[A-Z][a-z]{2,}/.test(s)) score += 0.02;
-    scores.push({idx, score, text: s});
-  });
-  return scores;
-}
+  <script>
+    // Constants
+    const MAX_CHARACTERS = 10000;
+    
+    const STOPWORDS = new Set([
+      'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
+      'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after',
+      'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once',
+      'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each', 'few', 'more',
+      'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same',
+      'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should',
+      'now', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
+      'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself',
+      'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them',
+      'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this',
+      'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been',
+      'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing',
+      'would', 'could', 'ought', 'as', 'until', 'while', 'because', 'if', 'also'
+    ]);
 
-function pickTopSentences(scored, n, keepOrder){
-  // sort by score descending
-  const sorted = [...scored].sort((a,b)=>b.score - a.score);
-  const chosen = sorted.slice(0, Math.min(n, sorted.length));
-  if(keepOrder){
-    chosen.sort((a,b)=>a.idx - b.idx);
-  } else {
-    // keep them descending by score (more punchy)
-    chosen.sort((a,b)=>b.score - a.score);
-  }
-  return chosen.map(x=>x.text);
-}
+    const SAMPLE_TEXTS = [
+      {
+        title: "Climate Change",
+        text: `Climate change represents one of the most pressing challenges facing humanity today. The Earth's average temperature has risen by approximately 1.1 degrees Celsius since the pre-industrial era, primarily due to human activities that release greenhouse gases into the atmosphere. These activities include burning fossil fuels for energy, deforestation, and industrial processes.
 
-function postProcessSummary(text){
-  // trim spaces & ensure proper punctuation spacing
-  let t = text.replace(/\s+\./g, '.').replace(/\s+,/g, ',').replace(/\s{2,}/g,' ').trim();
-  // ensure there is a final period
-  if(!/[.!?]$/.test(t)) t = t + '.';
-  return t;
-}
+The consequences of climate change are far-reaching and increasingly visible. Rising sea levels threaten coastal communities around the world, while more frequent and intense extreme weather events cause devastating floods, droughts, and wildfires. Ecosystems are being disrupted, with many species facing extinction as their habitats change faster than they can adapt.
 
-/* Main summarizer */
-function summarizeNow(){
-  status.innerHTML = '<span class="spinner"></span> Summarizing...';
-  setTimeout(()=>{ // allow spinner to appear
-    try {
-      const raw = inputEl.value;
-      if(!raw || !raw.trim()){
-        outputBox.textContent = '⚠️ Please paste some text first.';
-        status.textContent = '';
-        return;
+Scientists emphasize the urgent need for immediate action to reduce greenhouse gas emissions. The Paris Agreement, signed by nearly 200 countries, aims to limit global warming to 1.5 degrees Celsius above pre-industrial levels. Achieving this goal requires a rapid transition to renewable energy sources, improved energy efficiency, and changes in land use practices.
+
+Individuals can also contribute to climate action through lifestyle changes such as reducing energy consumption, choosing sustainable transportation options, and supporting policies that prioritize environmental protection. The challenge of climate change requires collective action at all levels of society, from individuals and communities to businesses and governments.`
+      },
+      {
+        title: "Artificial Intelligence",
+        text: `Artificial intelligence has emerged as one of the most transformative technologies of the 21st century, reshaping industries and changing how we live and work. From virtual assistants that help us manage daily tasks to sophisticated algorithms that power recommendation systems, AI has become deeply integrated into modern life.
+
+Machine learning, a subset of AI, enables computers to learn from data and improve their performance over time without being explicitly programmed. Deep learning, which uses neural networks inspired by the human brain, has achieved remarkable breakthroughs in image recognition, natural language processing, and game playing.
+
+The applications of AI span virtually every sector. In healthcare, AI assists in diagnosing diseases, discovering new drugs, and personalizing treatment plans. In finance, algorithms analyze market trends and detect fraudulent transactions. In transportation, self-driving vehicles promise to revolutionize how we move people and goods.
+
+However, the rapid advancement of AI also raises important ethical and societal questions. Concerns about job displacement, algorithmic bias, privacy, and the potential misuse of AI systems require careful consideration. Researchers and policymakers are working to develop frameworks for responsible AI development that maximize benefits while minimizing risks. The future of AI will depend on our ability to harness its potential while addressing these challenges thoughtfully and proactively.`
+      },
+      {
+        title: "Space Exploration",
+        text: `Space exploration has captivated human imagination for centuries, and recent advances have brought us closer than ever to understanding our place in the universe. From the first satellite launch in 1957 to the ongoing missions to Mars, humanity's journey beyond Earth continues to yield remarkable discoveries and technological innovations.
+
+The International Space Station serves as a testament to international cooperation in space, hosting astronauts from multiple countries who conduct scientific experiments in microgravity. These studies advance our understanding of physics, biology, and medicine, with applications that benefit life on Earth.
+
+Private companies have revolutionized the space industry, making access to orbit more affordable and frequent. Reusable rocket technology has dramatically reduced launch costs, opening new possibilities for satellite deployment, space tourism, and eventually colonization of other worlds.
+
+Mars remains a primary target for human exploration, with multiple space agencies and private companies developing plans for crewed missions. The challenges are immense, including protecting astronauts from radiation, providing life support for months-long journeys, and establishing sustainable habitats on another planet.
+
+Looking further ahead, scientists dream of exploring the outer solar system and beyond. Missions to Europa and Enceladus could search for signs of life in subsurface oceans, while interstellar probes might one day carry human technology to distant stars. Space exploration continues to push the boundaries of what is possible and inspire new generations of scientists and engineers.`
       }
-      const cleaned = cleanText(raw);
-      let sentences = splitSentences(cleaned);
-      if(sentences.length === 0){
-        outputBox.textContent = '⚠️ Could not detect sentences. Try a different input.';
-        status.textContent = '';
-        return;
-      }
+    ];
 
-      // limit: if text is huge, trim to first 500 sentences (safety)
-      if(sentences.length > 500) sentences = sentences.slice(0,500);
+    // State
+    let currentLength = 'short';
+    let currentFormat = 'paragraph';
+    let isLoading = false;
+    let currentSummary = '';
+    let originalWordCount = 0;
 
-      const wordScores = buildWordScores(sentences);
-      const scored = scoreSentences(sentences, wordScores);
+    // DOM Elements
+    const inputText = document.getElementById('inputText');
+    const inputCard = document.getElementById('inputCard');
+    const wordCount = document.getElementById('wordCount');
+    const charCount = document.getElementById('charCount');
+    const errorMessage = document.getElementById('errorMessage');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const summarizeBtnText = document.getElementById('summarizeBtnText');
+    const outputContent = document.getElementById('outputContent');
+    const summaryWordCount = document.getElementById('summaryWordCount');
+    const reductionBadge = document.getElementById('reductionBadge');
+    const summaryCharCount = document.getElementById('summaryCharCount');
+    const actionButtons = document.getElementById('actionButtons');
+    const sampleDropdown = document.getElementById('sampleDropdown');
 
-      // choose N by length selector
-      const len = lengthSelect.value;
-      let N;
-      if(len === 'short') N = Math.max(1, Math.ceil(sentences.length * 0.08)); // ~8% of sentences
-      else if(len === 'medium') N = Math.max(2, Math.ceil(sentences.length * 0.18)); // ~18%
-      else N = Math.max(3, Math.ceil(sentences.length * 0.30)); // ~30%
+    // Initialize
+    function init() {
+      // Length buttons
+      document.querySelectorAll('[data-length]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-length]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLength = btn.dataset.length;
+        });
+      });
 
-      // clamp N to reasonable numbers
-      N = Math.min(N, Math.max(1, Math.ceil(sentences.length * 0.5)));
-      // For very short docs, ensure not more than sentences.length
-      N = Math.min(N, sentences.length);
+      // Format buttons
+      document.querySelectorAll('[data-format]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-format]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFormat = btn.dataset.format;
+        });
+      });
 
-      const keepOrder = keepOrderChk.checked;
-      const chosen = pickTopSentences(scored, N, keepOrder);
+      // Input events
+      inputText.addEventListener('input', updateCounts);
+      inputText.addEventListener('focus', () => inputCard.classList.add('focused'));
+      inputText.addEventListener('blur', () => inputCard.classList.remove('focused'));
 
-      // Format output
-      let out = '';
-      if(modeSelect.value === 'bullets'){
-        out = chosen.map(s => '• ' + s.replace(/\s+/g,' ').trim()).join('\n\n');
-      } else {
-        // paragraph merge: join chosen sentences keeping spacing
-        out = chosen.join(' ');
-        out = postProcessSummary(out);
-      }
+      // Keyboard shortcut
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          if (canSummarize()) {
+            summarize();
+          }
+        }
+      });
 
-      lastSummary = out;
-      outputBox.textContent = out;
-      status.textContent = `Done • ${chosen.length} sentence${chosen.length>1?'s':''}`;
-    } catch(e){
-      console.error(e);
-      outputBox.textContent = '⚠️ Something went wrong. Try smaller text or refresh the page.';
-      status.textContent = '';
+      // Close dropdown on outside click
+      document.addEventListener('click', (e) => {
+        if (!sampleDropdown.contains(e.target)) {
+          sampleDropdown.classList.remove('open');
+        }
+      });
     }
-  }, 220);
-}
 
-/* Buttons & interactions */
-summarizeBtn.addEventListener('click', summarizeNow);
-sampleBtn.addEventListener('click', ()=>{
-  const sample = `Photosynthesis is the process used by plants and other organisms to convert light energy into chemical energy that can later be released to fuel the organism's activities. This process is essential for life on Earth because it provides the base energy that drives the food chain. The basic inputs are sunlight, carbon dioxide, and water; the outputs are oxygen and glucose. Photosynthesis occurs primarily in the chloroplasts of plant cells. There are two main stages: the light-dependent reactions and the Calvin cycle. Light-dependent reactions convert light energy into ATP and NADPH, while the Calvin cycle uses those molecules to synthesize sugars. The rate of photosynthesis is affected by factors like light intensity, carbon dioxide concentration, and temperature. Understanding photosynthesis is important for improving crop yields and addressing climate change concerns.`;
-  inputEl.value = sample;
-  updateCounts();
-});
+    // Utility functions
+    function getWordCount(text) {
+      if (!text || text.trim().length === 0) return 0;
+      return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }
 
-clearBtn.addEventListener('click', ()=>{
-  inputEl.value = '';
-  outputBox.textContent = 'Your summary will appear here after clicking Summarize.';
-  updateCounts();
-  status.textContent = '';
-});
+    function getCharacterCount(text) {
+      return text.length;
+    }
 
-copyBtn.addEventListener('click', ()=>{
-  if(!lastSummary || lastSummary.trim()==='') return;
-  navigator.clipboard.writeText(lastSummary).then(()=>{
-    copyBtn.textContent = 'Copied ✓';
-    setTimeout(()=>copyBtn.textContent = 'Copy',1200);
-  });
-});
+    function tokenize(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(word => word.length > 0 && !STOPWORDS.has(word));
+    }
 
-downloadBtn.addEventListener('click', ()=>{
-  if(!lastSummary || lastSummary.trim()==='') return;
-  const blob = new Blob([lastSummary], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'summary.txt';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-});
+    function splitIntoSentences(text) {
+      const normalized = text
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{2,}/g, ' ')
+        .replace(/\n/g, ' ')
+        .trim();
 
-/* keyboard shortcut */
-inputEl.addEventListener('keydown', (e)=>{
-  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-    summarizeNow();
-  }
-});
+      const sentencePattern = /[^.!?]*[.!?]+(?:\s|$)|[^.!?]+$/g;
+      const matches = normalized.match(sentencePattern) || [];
+      
+      return matches
+        .map(s => s.trim())
+        .filter(s => {
+          const wordCount = s.split(/\s+/).filter(w => w.length > 0).length;
+          return wordCount >= 3 && s.length >= 10;
+        });
+    }
 
-/* initial counts */
-updateCounts();
+    function calculateTermFrequency(sentences) {
+      const frequency = new Map();
+      
+      sentences.forEach(sentence => {
+        const words = tokenize(sentence);
+        words.forEach(word => {
+          frequency.set(word, (frequency.get(word) || 0) + 1);
+        });
+      });
+      
+      return frequency;
+    }
 
-</script>
+    function scoreSentence(sentence, index, totalSentences, termFrequency, maxFrequency) {
+      const words = tokenize(sentence);
+      
+      if (words.length === 0) return 0;
+      
+      let tfScore = 0;
+      words.forEach(word => {
+        const freq = termFrequency.get(word) || 0;
+        tfScore += freq / maxFrequency;
+      });
+      tfScore = tfScore / words.length;
+      
+      let positionScore = 0;
+      if (index === 0) {
+        positionScore = 1.0;
+      } else if (index === totalSentences - 1) {
+        positionScore = 0.8;
+      } else if (index < totalSentences * 0.2) {
+        positionScore = 0.7;
+      } else if (index > totalSentences * 0.8) {
+        positionScore = 0.5;
+      } else {
+        positionScore = 0.3;
+      }
+      
+      const wordCount = sentence.split(/\s+/).length;
+      let lengthScore = 0;
+      if (wordCount >= 10 && wordCount <= 30) {
+        lengthScore = 1.0;
+      } else if (wordCount > 30 && wordCount <= 50) {
+        lengthScore = 0.7;
+      } else if (wordCount > 50) {
+        lengthScore = 0.4;
+      } else {
+        lengthScore = 0.5;
+      }
+      
+      return (tfScore * 0.5) + (positionScore * 0.35) + (lengthScore * 0.15);
+    }
+
+    function getSentenceCount(totalSentences, length) {
+      const ratios = {
+        short: 0.2,
+        medium: 0.4,
+        long: 0.6
+      };
+      
+      const count = Math.max(1, Math.round(totalSentences * ratios[length]));
+      return Math.min(count, totalSentences);
+    }
+
+    function summarizeText(text, length, format) {
+      if (!text || text.trim().length === 0) {
+        return '';
+      }
+      
+      const sentences = splitIntoSentences(text);
+      
+      if (sentences.length === 0) {
+        return text.trim();
+      }
+      
+      if (sentences.length <= 2) {
+        return format === 'bullet' 
+          ? sentences.map(s => `• ${s}`).join('\n')
+          : sentences.join(' ');
+      }
+      
+      const termFrequency = calculateTermFrequency(sentences);
+      const maxFrequency = Math.max(...Array.from(termFrequency.values()), 1);
+      
+      const scoredSentences = sentences.map((sentence, index) => ({
+        text: sentence,
+        index,
+        score: scoreSentence(sentence, index, sentences.length, termFrequency, maxFrequency)
+      }));
+      
+      const targetCount = getSentenceCount(sentences.length, length);
+      
+      const topSentences = [...scoredSentences]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, targetCount)
+        .sort((a, b) => a.index - b.index);
+      
+      if (format === 'bullet') {
+        return topSentences.map(s => `• ${s.text}`).join('\n\n');
+      }
+      
+      return topSentences.map(s => s.text).join(' ');
+    }
+
+    // UI Functions
+    function updateCounts() {
+      const text = inputText.value;
+      const chars = getCharacterCount(text);
+      const words = getWordCount(text);
+      
+      wordCount.textContent = `${words.toLocaleString()} words`;
+      charCount.textContent = `${chars.toLocaleString()} / ${MAX_CHARACTERS.toLocaleString()} characters`;
+      
+      const isOverLimit = chars > MAX_CHARACTERS;
+      const isNearLimit = chars > MAX_CHARACTERS * 0.9;
+      
+      charCount.classList.remove('warning', 'error');
+      if (isOverLimit) {
+        charCount.classList.add('error');
+        inputCard.classList.add('error');
+        inputCard.classList.remove('focused');
+        errorMessage.style.display = 'flex';
+      } else {
+        inputCard.classList.remove('error');
+        errorMessage.style.display = 'none';
+        if (isNearLimit) {
+          charCount.classList.add('warning');
+        }
+      }
+      
+      summarizeBtn.disabled = !canSummarize();
+      
+      // Clear summary when input changes
+      if (currentSummary) {
+        currentSummary = '';
+        showEmptyState();
+      }
+    }
+
+    function canSummarize() {
+      const text = inputText.value;
+      return text.trim().length > 0 && getCharacterCount(text) <= MAX_CHARACTERS && !isLoading;
+    }
+
+    function showLoading() {
+      isLoading = true;
+      summarizeBtn.disabled = true;
+      summarizeBtnText.innerHTML = '<span class="spinner"></span> Processing...';
+      
+      outputContent.innerHTML = `
+        <div class="skeleton-container">
+          <div class="skeleton" style="width: 100%;"></div>
+          <div class="skeleton" style="width: 92%;"></div>
+          <div class="skeleton" style="width: 85%;"></div>
+          <div class="skeleton" style="width: 100%;"></div>
+          <div class="skeleton" style="width: 78%;"></div>
+          <div class="skeleton" style="width: 92%;"></div>
+          <div class="skeleton" style="width: 65%;"></div>
+        </div>
+      `;
+      
+      summaryWordCount.style.display = 'none';
+      reductionBadge.style.display = 'none';
+      actionButtons.style.display = 'none';
+      summaryCharCount.style.display = 'none';
+    }
+
+    function showEmptyState() {
+      outputContent.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            </svg>
+          </div>
+          <p>Your summary will appear here</p>
+          <p>Enter text on the left and click Summarize</p>
+        </div>
+      `;
+      
+      summaryWordCount.style.display = 'none';
+      reductionBadge.style.display = 'none';
+      actionButtons.style.display = 'none';
+      summaryCharCount.style.display = 'none';
+    }
+
+    function showSummary(summary) {
+      currentSummary = summary;
+      const summaryWords = getWordCount(summary);
+      const summaryChars = getCharacterCount(summary);
+      const reduction = originalWordCount > 0 
+        ? Math.round((1 - summaryWords / originalWordCount) * 100) 
+        : 0;
+      
+      outputContent.innerHTML = `<div class="output-text" data-testid="text-summary">${escapeHtml(summary)}</div>`;
+      
+      summaryWordCount.textContent = `${summaryWords.toLocaleString()} words`;
+      summaryWordCount.style.display = 'inline-block';
+      
+      if (reduction > 0) {
+        reductionBadge.textContent = `${reduction}% shorter`;
+        reductionBadge.style.display = 'inline-block';
+      }
+      
+      summaryCharCount.textContent = `${summaryChars.toLocaleString()} characters`;
+      summaryCharCount.style.display = 'block';
+      
+      actionButtons.style.display = 'flex';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function summarize() {
+      if (!canSummarize()) return;
+      
+      originalWordCount = getWordCount(inputText.value);
+      showLoading();
+      
+      // Simulate processing delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      const summary = summarizeText(inputText.value, currentLength, currentFormat);
+      
+      isLoading = false;
+      summarizeBtn.disabled = false;
+      summarizeBtnText.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        </svg>
+        <span>Summarize</span>
+      `;
+      
+      showSummary(summary);
+    }
+
+    function toggleDropdown() {
+      sampleDropdown.classList.toggle('open');
+    }
+
+    function loadSample(index) {
+      inputText.value = SAMPLE_TEXTS[index].text;
+      updateCounts();
+      sampleDropdown.classList.remove('open');
+      inputText.focus();
+    }
+
+    async function copyToClipboard() {
+      if (!currentSummary) return;
+      
+      try {
+        await navigator.clipboard.writeText(currentSummary);
+        
+        // Show check icon
+        document.getElementById('copyIcon').style.display = 'none';
+        document.getElementById('checkIcon').style.display = 'block';
+        
+        showToast('Copied to clipboard', 'Summary has been copied successfully.');
+        
+        setTimeout(() => {
+          document.getElementById('copyIcon').style.display = 'block';
+          document.getElementById('checkIcon').style.display = 'none';
+        }, 2000);
+      } catch (err) {
+        showToast('Failed to copy', 'Please try selecting and copying manually.', true);
+      }
+    }
+
+    function downloadSummary() {
+      if (!currentSummary) return;
+      
+      const blob = new Blob([currentSummary], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `summary-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      // Show check icon
+      document.getElementById('downloadIcon').style.display = 'none';
+      document.getElementById('downloadCheckIcon').style.display = 'block';
+      
+      showToast('Downloaded', 'Summary has been saved as a text file.');
+      
+      setTimeout(() => {
+        document.getElementById('downloadIcon').style.display = 'block';
+        document.getElementById('downloadCheckIcon').style.display = 'none';
+      }, 2000);
+    }
+
+    function showToast(title, description, isError = false) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div class="toast-title">${title}</div>
+        <div class="toast-description">${description}</div>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
 
