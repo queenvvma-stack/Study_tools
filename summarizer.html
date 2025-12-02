@@ -1,121 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Notes Summarizer</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1b3c73, #5b9bd5);
-      color: white;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StudyTools — Smart Summarizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0059ff; --bg2:#00b7ff; --card:rgba(255,255,255,0.96);
+    --accent:#0059ff; --muted:#6b7280;
+  }
+  html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#f3f6ff 0%, #f9fbff 100%);color:#0b1220}
+  .page {max-width:1000px;margin:28px auto;padding:20px}
+  header {text-align:center;margin-bottom:18px}
+  header h1{margin:0;font-size:28px;color:var(--accent)}
+  header p{margin-top:8px;color:var(--muted)}
 
-    header {
-      padding: 20px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-    }
+  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 30px rgba(10,20,60,0.06)}
+  .row{display:flex;gap:12px;align-items:center}
+  .col{flex:1}
 
-    .container {
-      width: 90%;
-      max-width: 700px;
-      margin: 40px auto;
-      background: rgba(255,255,255,0.15);
-      padding: 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
+  label.small{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
 
-    textarea {
-      width: 100%;
-      height: 180px;
-      border: none;
-      outline: none;
-      border-radius: 15px;
-      padding: 15px;
-      font-size: 16px;
-      resize: none;
-    }
+  textarea#inputText{
+    width:100%;min-height:220px;border-radius:10px;border:1px solid #e6eefc;padding:14px;font-size:15px;outline:none;resize:vertical;
+    box-shadow:inset 0 1px 0 rgba(0,0,0,0.02);
+  }
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 15px;
-      background: white;
-      color: #1b3c73;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .btn{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+  .btn.ghost{background:transparent;border:1px solid #e6eefc;color:var(--accent)}
+  .btn.secondary{background:#f3f5ff;color:var(--accent);border:1px solid #dfeaff}
+  .btn.small{padding:8px 10px;font-size:14px}
 
-    button:hover {
-      background: #f0f0f0;
-    }
+  .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font-size:13px;gap:12px;flex-wrap:wrap}
 
-    .output {
-      margin-top: 25px;
-      padding: 20px;
-      border-radius: 15px;
-      background: rgba(255,255,255,0.25);
-      min-height: 120px;
-      font-size: 16px;
-      white-space: pre-wrap;
-    }
+  .options{display:flex;gap:10px;align-items:center}
+  .select, .radio {padding:8px 10px;border-radius:8px;border:1px solid #e6eefc;background:white}
 
-    a {
-      color: white;
-      font-weight: bold;
-      text-decoration: underline;
-    }
-  </style>
+  .output-area{margin-top:18px}
+  .output-box{background:#fff;border-radius:10px;padding:16px;border:1px solid #e9f0ff;min-height:120px;white-space:pre-wrap;color:#0b1220}
+  .controls-bottom{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+
+  .chips{display:flex;gap:8px}
+  .chip{background:#f3f5ff;color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:600;border:1px solid #dfeaff;font-size:13px}
+
+  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+
+  .flex-between{display:flex;justify-content:space-between;align-items:center}
+  a.back{color:var(--muted);text-decoration:underline;font-size:14px}
+
+  /* responsive */
+  @media(max-width:720px){
+    .row{flex-direction:column}
+    .controls-bottom{justify-content:stretch}
+  }
+
+  /* spinner */
+  .spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(0,0,0,0.08);border-top-color:var(--accent);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+</style>
 </head>
 <body>
+  <div class="page">
+    <header>
+      <h1>Smart Summarizer</h1>
+      <p>Better summaries without any API — fast, private, and completely in your browser.</p>
+    </header>
 
-<header>
-  Study Notes Summarizer
-</header>
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:12px">
+        <div style="display:flex;gap:12px;align-items:center">
+          <a class="back" href="index.html">⬅ Back to Home</a>
+          <div class="chips">
+            <div class="chip">Frontend-only</div>
+            <div class="chip">No API key</div>
+            <div class="chip">Private</div>
+          </div>
+        </div>
 
-<div class="container">
+        <div style="text-align:right">
+          <div style="font-size:13px;color:var(--muted)">Tip: Press <strong>Ctrl/Cmd + Enter</strong> to summarize</div>
+        </div>
+      </div>
 
-  <p><a href="index.html">⬅ Back to Home</a></p>
+      <label class="small">Paste or type your study content</label>
+      <textarea id="inputText" placeholder="Paste lecture notes, textbook paragraphs, or long study text..."></textarea>
 
-  <h2>Paste your study notes:</h2>
+      <div class="meta">
+        <div id="counts" style="color:var(--muted)">Words: 0 • Characters: 0</div>
 
-  <textarea id="inputText" placeholder="Paste long notes here..."></textarea>
+        <div class="options" aria-hidden="false">
+          <select id="length" class="select" title="Summary length">
+            <option value="short">Short (1–2 lines)</option>
+            <option value="medium" selected>Medium (3–4 lines)</option>
+            <option value="long">Long (5–8 lines)</option>
+          </select>
 
-  <button onclick="summarize()">Summarize Notes</button>
+          <select id="mode" class="select" title="Output mode">
+            <option value="paragraph" selected>Paragraph</option>
+            <option value="bullets">Bulleted Points</option>
+          </select>
 
-  <div class="output" id="outputBox">Your summary will appear here...</div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)">
+            <input type="checkbox" id="keepOrder" /> Keep sentence order
+          </label>
+        </div>
+      </div>
 
-</div>
+      <div class="controls">
+        <button class="btn" id="summarizeBtn">Summarize</button>
+        <button class="btn ghost" id="sampleBtn">Try Sample Text</button>
+        <button class="btn secondary" id="clearBtn">Clear</button>
+      </div>
+
+      <div class="output-area">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">Summary</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn small" id="copyBtn">Copy</button>
+            <button class="btn small ghost" id="downloadBtn">Download</button>
+            <div id="status" style="font-size:13px;color:var(--muted)"></div>
+          </div>
+        </div>
+
+        <div class="output-box" id="outputBox">Your summary will appear here after clicking <strong>Summarize</strong>.</div>
+
+        <div class="controls-bottom">
+          <div class="hint">Use the length and mode options to control summary size & format.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
-  function summarize() {
-    let text = document.getElementById("inputText").value;
+/* Smart Extractive Summarizer — frontend only
+   Strategy:
+   1) Clean input (normalize whitespace & punctuation).
+   2) Split into sentences.
+   3) Build a simple term-frequency score for words (without stopwords).
+   4) Score sentences by sum of word scores + position bonus + length penalty.
+   5) Pick top N sentences depending on chosen length.
+   6) Optionally keep original order.
+   7) Minor post-processing to fix punctuation and spacing.
+*/
 
-    if (text.trim() === "") {
-      return document.getElementById("outputBox").innerText =
-        "⚠️ Please paste some text first!";
-    }
+const STOPWORDS = new Set([
+  "the","is","in","and","to","of","a","that","it","on","for","as","are","with","was","were","be","by","this","an","or","from","at","which","but","has","have","had","not","they","their","its","can","will","would","should","may","if","we","you","your","i","he","she","them"
+]);
 
-    // Simple summarization logic (no backend needed)
-    let sentences = text.split(".");
-    let summary = sentences.slice(0, 3).join(".") + ".";
+const inputEl = document.getElementById('inputText');
+const summarizeBtn = document.getElementById('summarizeBtn');
+const sampleBtn = document.getElementById('sampleBtn');
+const clearBtn = document.getElementById('clearBtn');
+const lengthSelect = document.getElementById('length');
+const modeSelect = document.getElementById('mode');
+const outputBox = document.getElementById('outputBox');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const counts = document.getElementById('counts');
+const status = document.getElementById('status');
+const keepOrderChk = document.getElementById('keepOrder');
 
-    document.getElementById("outputBox").innerText = summary;
+let lastSummary = '';
+
+/* Helpers */
+function updateCounts(){
+  const text = inputEl.value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  const chars = text.length;
+  counts.textContent = `Words: ${words} • Characters: ${chars}`;
+}
+inputEl.addEventListener('input', updateCounts);
+
+function cleanText(text){
+  // normalize spaces and fix weird punctuation spacing
+  let t = text.replace(/\r\n/g, '\n').replace(/\t/g,' ').replace(/\u00A0/g,' ');
+  t = t.replace(/\s{2,}/g,' ').trim();
+  // ensure sentences end with punctuation
+  t = t.replace(/([a-z0-9])\n([A-Z])/g, '$1. $2');
+  return t;
+}
+
+function splitSentences(text){
+  // this regex captures sentence endings but keeps abbreviations safe in basic cases
+  const raw = text.match(/[^.!?]+[.!?]*/g) || [];
+  return raw.map(s=>s.trim()).filter(Boolean);
+}
+
+function tokenize(text){
+  return text.toLowerCase().match(/\b[^\s,.!?;:()]+\b/g) || [];
+}
+
+function buildWordScores(sentences){
+  const freq = Object.create(null);
+  let maxFreq = 0;
+  sentences.forEach(s=>{
+    const tokens = tokenize(s).filter(w=>!STOPWORDS.has(w));
+    tokens.forEach(w=>{
+      freq[w] = (freq[w] || 0) + 1;
+      if(freq[w] > maxFreq) maxFreq = freq[w];
+    });
+  });
+  // normalize
+  Object.keys(freq).forEach(k=> freq[k] = freq[k] / maxFreq );
+  return freq;
+}
+
+function scoreSentences(sentences, wordScores){
+  const scores = [];
+  sentences.forEach((s, idx)=>{
+    const tokens = tokenize(s);
+    let score = 0;
+    tokens.forEach(w=>{
+      if(wordScores[w]) score += wordScores[w];
+    });
+    // position bonus: first and last sentences slightly more important
+    const posBonus = (idx === 0 || idx === sentences.length-1) ? 0.15 : 0;
+    // length penalty: extremely short sentences are less informative
+    const len = tokens.length;
+    const lengthFactor = Math.min(1, len / 20); // 20 words is good
+    score = score * lengthFactor + posBonus;
+    // small boost for sentences with proper nouns (capitalized words)
+    if(/[A-Z][a-z]{2,}/.test(s)) score += 0.02;
+    scores.push({idx, score, text: s});
+  });
+  return scores;
+}
+
+function pickTopSentences(scored, n, keepOrder){
+  // sort by score descending
+  const sorted = [...scored].sort((a,b)=>b.score - a.score);
+  const chosen = sorted.slice(0, Math.min(n, sorted.length));
+  if(keepOrder){
+    chosen.sort((a,b)=>a.idx - b.idx);
+  } else {
+    // keep them descending by score (more punchy)
+    chosen.sort((a,b)=>b.score - a.score);
   }
-</script>
+  return chosen.map(x=>x.text);
+}
 
+function postProcessSummary(text){
+  // trim spaces & ensure proper punctuation spacing
+  let t = text.replace(/\s+\./g, '.').replace(/\s+,/g, ',').replace(/\s{2,}/g,' ').trim();
+  // ensure there is a final period
+  if(!/[.!?]$/.test(t)) t = t + '.';
+  return t;
+}
+
+/* Main summarizer */
+function summarizeNow(){
+  status.innerHTML = '<span class="spinner"></span> Summarizing...';
+  setTimeout(()=>{ // allow spinner to appear
+    try {
+      const raw = inputEl.value;
+      if(!raw || !raw.trim()){
+        outputBox.textContent = '⚠️ Please paste some text first.';
+        status.textContent = '';
+        return;
+      }
+      const cleaned = cleanText(raw);
+      let sentences = splitSentences(cleaned);
+      if(sentences.length === 0){
+        outputBox.textContent = '⚠️ Could not detect sentences. Try a different input.';
+        status.textContent = '';
+        return;
+      }
+
+      // limit: if text is huge, trim to first 500 sentences (safety)
+      if(sentences.length > 500) sentences = sentences.slice(0,500);
+
+      const wordScores = buildWordScores(sentences);
+      const scored = scoreSentences(sentences, wordScores);
+
+      // choose N by length selector
+      const len = lengthSelect.value;
+      let N;
+      if(len === 'short') N = Math.max(1, Math.ceil(sentences.length * 0.08)); // ~8% of sentences
+      else if(len === 'medium') N = Math.max(2, Math.ceil(sentences.length * 0.18)); // ~18%
+      else N = Math.max(3, Math.ceil(sentences.length * 0.30)); // ~30%
+
+      // clamp N to reasonable numbers
+      N = Math.min(N, Math.max(1, Math.ceil(sentences.length * 0.5)));
+      // For very short docs, ensure not more than sentences.length
+      N = Math.min(N, sentences.length);
+
+      const keepOrder = keepOrderChk.checked;
+      const chosen = pickTopSentences(scored, N, keepOrder);
+
+      // Format output
+      let out = '';
+      if(modeSelect.value === 'bullets'){
+        out = chosen.map(s => '• ' + s.replace(/\s+/g,' ').trim()).join('\n\n');
+      } else {
+        // paragraph merge: join chosen sentences keeping spacing
+        out = chosen.join(' ');
+        out = postProcessSummary(out);
+      }
+
+      lastSummary = out;
+      outputBox.textContent = out;
+      status.textContent = `Done • ${chosen.length} sentence${chosen.length>1?'s':''}`;
+    } catch(e){
+      console.error(e);
+      outputBox.textContent = '⚠️ Something went wrong. Try smaller text or refresh the page.';
+      status.textContent = '';
+    }
+  }, 220);
+}
+
+/* Buttons & interactions */
+summarizeBtn.addEventListener('click', summarizeNow);
+sampleBtn.addEventListener('click', ()=>{
+  const sample = `Photosynthesis is the process used by plants and other organisms to convert light energy into chemical energy that can later be released to fuel the organism's activities. This process is essential for life on Earth because it provides the base energy that drives the food chain. The basic inputs are sunlight, carbon dioxide, and water; the outputs are oxygen and glucose. Photosynthesis occurs primarily in the chloroplasts of plant cells. There are two main stages: the light-dependent reactions and the Calvin cycle. Light-dependent reactions convert light energy into ATP and NADPH, while the Calvin cycle uses those molecules to synthesize sugars. The rate of photosynthesis is affected by factors like light intensity, carbon dioxide concentration, and temperature. Understanding photosynthesis is important for improving crop yields and addressing climate change concerns.`;
+  inputEl.value = sample;
+  updateCounts();
+});
+
+clearBtn.addEventListener('click', ()=>{
+  inputEl.value = '';
+  outputBox.textContent = 'Your summary will appear here after clicking Summarize.';
+  updateCounts();
+  status.textContent = '';
+});
+
+copyBtn.addEventListener('click', ()=>{
+  if(!lastSummary || lastSummary.trim()==='') return;
+  navigator.clipboard.writeText(lastSummary).then(()=>{
+    copyBtn.textContent = 'Copied ✓';
+    setTimeout(()=>copyBtn.textContent = 'Copy',1200);
+  });
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  if(!lastSummary || lastSummary.trim()==='') return;
+  const blob = new Blob([lastSummary], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'summary.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+/* keyboard shortcut */
+inputEl.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    summarizeNow();
+  }
+});
+
+/* initial counts */
+updateCounts();
+
+</script>
 </body>
 </html>
 
