@@ -1,119 +1,649 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Question Generator | StudyTools</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #4A148C, #880E4F);
-    color: white;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Generator - Study Suite</title>
+    <meta name="description" content="Automatically generate practice questions from your study material.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  header {
-    text-align: center;
-    padding: 50px 20px 20px;
-  }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAFA',
+                        foreground: '#18181B',
+                        card: '#FFFFFF',
+                        'card-foreground': '#18181B',
+                        primary: '#18181B',
+                        'primary-foreground': '#FFFFFF',
+                        secondary: '#F4F4F5',
+                        'secondary-foreground': '#18181B',
+                        muted: '#F4F4F5',
+                        'muted-foreground': '#71717A',
+                        accent: '#4F46E5',
+                        'accent-foreground': '#FFFFFF',
+                        destructive: '#EF4444',
+                        border: '#E4E4E7',
+                        input: '#E4E4E7',
+                        ring: '#4F46E5',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                        'premium-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                        'premium-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                        'premium-hover': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-  header h1 {
-    font-size: 42px;
-    font-weight: 700;
-  }
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E4E4E7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1AA;
+        }
+        
+        .glass-header {
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+        }
 
-  header p {
-    font-size: 18px;
-    opacity: 0.9;
-  }
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            color: #18181B;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #E4E4E7;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
-  .container {
-    width: 90%;
-    max-width: 700px;
-    margin: 40px auto;
-    background: rgba(255,255,255,0.12);
-    padding: 30px;
-    border-radius: 18px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  }
-
-  input, button {
-    width: 100%;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-  }
-
-  input { outline: none; }
-
-  button {
-    background: white;
-    color: #4A148C;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  button:hover { background: #f3f3f3; }
-
-  .output {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.25);
-    color: #4A148C;
-    font-weight: 600;
-    font-size: 16px;
-    white-space: pre-line;
-  }
-</style>
+        /* Question Card Styles */
+        .question-card {
+            transition: all 0.3s ease;
+        }
+        .question-card:hover {
+            border-color: #4F46E5;
+            transform: translateY(-2px);
+        }
+        
+        .option-label {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-label:hover {
+            background-color: #F4F4F5;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-background text-foreground font-sans min-h-screen selection:bg-accent/10 selection:text-accent">
 
-<header>
-  <h1>Question Generator</h1>
-  <p>Create instant study questions based on any topic!</p>
-</header>
+    <!-- Header -->
+    <header class="glass-header fixed top-0 left-0 right-0 z-50 h-20 flex items-center transition-all duration-300">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group cursor-pointer decoration-0">
+                <div class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <span class="font-heading text-xl font-bold tracking-tight text-primary">Study Suite</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Tools</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Pricing</a>
+                <a href="#" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">About</a>
+            </nav>
+        </div>
+    </header>
 
-<div class="container">
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 container mx-auto px-6 max-w-5xl">
+        
+        <!-- Breadcrumb -->
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+        </div>
 
-  <input id="topicInput" placeholder="Enter a topic, for example: Photosynthesis">
-  <button onclick="generateQuestions()">Generate Questions</button>
+        <div class="text-center mb-12 animate-slide-up">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6 border border-accent/20">
+                Premium Tools
+            </span>
+            <h1 class="font-heading text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-b from-primary to-zinc-600 bg-clip-text text-transparent pb-2">
+                Question Generator
+            </h1>
+            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Turn any text into a quiz. Automatically generate MCQs, True/False, and Short Answer questions from your study material.
+            </p>
+        </div>
 
-  <div class="output" id="outputBox">Your generated questions will appear here...</div>
+        <!-- Tool Interface -->
+        <div class="grid lg:grid-cols-12 gap-8 animate-slide-up" style="animation-delay: 0.1s;">
+            
+            <!-- Left Column: Input & Settings -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-card border border-border rounded-2xl shadow-premium-lg overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-muted-foreground"></i>
+                            <span class="text-sm font-medium text-secondary-foreground">Source Material</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span id="input-counts">0 words</span>
+                            <button onclick="app.clearInput()" class="p-1.5 hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Clear">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="text-input"
+                        class="w-full h-[300px] p-6 bg-background resize-none outline-none text-base leading-relaxed placeholder:text-muted-foreground/50 font-sans"
+                        placeholder="Paste your chapter summary, notes, or article here..."
+                    ></textarea>
+                </div>
 
-</div>
+                <!-- Settings Card -->
+                <div class="bg-card border border-border rounded-2xl shadow-premium-md p-6 space-y-6">
+                    <div>
+                        <label class="text-sm font-medium text-secondary-foreground mb-2 block">Question Type</label>
+                        <div class="relative">
+                            <select id="q-type" class="w-full appearance-none bg-background border border-border text-foreground text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all shadow-sm">
+                                <option value="mcq">Multiple Choice (MCQ)</option>
+                                <option value="truefalse">True / False</option>
+                                <option value="fillblanks">Fill-in-the-Blanks</option>
+                                <option value="short">Short Answer</option>
+                                <option value="long">Long Answer</option>
+                                <option value="mixed">Mixed Mode</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-muted-foreground">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
 
-<script>
-  function generateQuestions() {
-    const topic = document.getElementById("topicInput").value.trim();
-    const outputBox = document.getElementById("outputBox");
+                    <div>
+                        <label class="text-sm font-medium text-secondary-foreground mb-2 block">Number of Questions</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" id="q-count-range" min="1" max="20" value="5" class="flex-grow h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent">
+                            <span id="q-count-display" class="w-12 text-center font-mono font-medium text-primary bg-secondary py-1 rounded-md border border-border">5</span>
+                        </div>
+                    </div>
 
-    if (topic === "") {
-      outputBox.innerText = "⚠️ Please enter a topic!";
-      return;
-    }
+                    <button onclick="app.generate()" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-6 py-3.5 rounded-xl font-semibold shadow-premium-md hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-premium-lg transition-all active:translate-y-0 active:shadow-sm">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        Generate Questions
+                    </button>
+                    
+                    <div class="text-center text-xs text-muted-foreground">
+                        Or press <kbd class="px-1 py-0.5 rounded bg-muted border border-border font-mono text-[10px]">Ctrl+Enter</kbd>
+                    </div>
+                </div>
+            </div>
 
-    const questions = [
-      `1. What is ${topic} and why is it important?`,
-      `2. How does ${topic} work step by step?`,
-      `3. What are the main components involved in ${topic}?`,
-      `4. How is ${topic} used in real life?`,
-      `5. What are the advantages and disadvantages of ${topic}?`,
-      `6. Who discovered or developed the concept of ${topic}?`,
-      `7. What common mistakes do people make while understanding ${topic}?`,
-      `8. How does ${topic} compare with similar concepts?`,
-      `9. What are the future possibilities related to ${topic}?`,
-      `10. Explain ${topic} in your own words.`
-    ];
+            <!-- Right Column: Output -->
+            <div class="lg:col-span-7">
+                <div class="bg-card border border-border rounded-2xl shadow-premium-lg overflow-hidden flex flex-col h-full min-h-[600px] relative">
+                    <div class="p-4 border-b border-border bg-secondary/30 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="list-checks" class="w-4 h-4 text-accent"></i>
+                            <span class="text-sm font-medium text-secondary-foreground">Generated Questions</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                            <button onclick="app.copyOutput()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-border rounded-md hover:text-accent hover:border-accent/30 transition-all shadow-sm">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="output-area" class="p-6 space-y-6 overflow-y-auto max-h-[800px] bg-secondary/5">
+                        <!-- Empty State -->
+                        <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center py-20 opacity-60">
+                            <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4">
+                                <i data-lucide="sparkles" class="w-8 h-8 text-muted-foreground"></i>
+                            </div>
+                            <p class="text-muted-foreground font-medium">Ready to create questions.</p>
+                            <p class="text-sm text-muted-foreground/70 max-w-xs mt-1">Paste your text on the left and click Generate.</p>
+                        </div>
+                    </div>
 
-    outputBox.innerText = questions.join("\n");
-  }
-</script>
+                    <!-- Loading Overlay -->
+                    <div id="loading-overlay" class="hidden absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+                        <div class="w-10 h-10 border-4 border-accent/20 border-t-accent rounded-full animate-spin mb-3"></div>
+                        <span class="text-sm font-medium text-accent animate-pulse">Analyzing text & creating questions...</span>
+                    </div>
+                </div>
+            </div>
 
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-white py-12">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+                <span class="font-heading font-bold text-lg">Study Suite</span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+                &copy; <span id="year"></span> Study Suite. Premium Tools for Students.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+        <div>
+            <h4 class="font-semibold text-sm" id="toast-title">Success</h4>
+            <p class="text-sm text-muted-foreground" id="toast-msg">Operation completed.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Question Generation Logic (Frontend Only) ---
+        const Generator = {
+            stopwords: new Set([
+                "the", "is", "at", "which", "on", "and", "a", "an", "in", "to", "of", "for", "with", "as", "by", "that", "this", "it", "are", "was", "were", "be", "been", "has", "have", "had", "but", "or", "if", "so", "not", "from", "can", "will", "would", "should", "could"
+            ]),
+
+            // Helper: Clean text
+            clean(text) {
+                return text.replace(/\s+/g, ' ').trim();
+            },
+
+            // Helper: Get sentences
+            getSentences(text) {
+                return text.match(/[^.!?]+[.!?]+(\s|$)/g) || [];
+            },
+
+            // Helper: Extract keywords (nouns/verbs roughly by length and capitalization)
+            getKeywords(sentence) {
+                const words = sentence.split(/[\s,.]+/);
+                return words.filter(w => 
+                    w.length > 4 && 
+                    !this.stopwords.has(w.toLowerCase()) &&
+                    !/^\d+$/.test(w)
+                );
+            },
+
+            // Generate MCQ
+            generateMCQ(sentence, allText) {
+                const keywords = this.getKeywords(sentence);
+                if (keywords.length === 0) return null;
+
+                // Pick a target keyword (answer)
+                const answer = keywords[Math.floor(Math.random() * keywords.length)];
+                
+                // Create question stem
+                const question = sentence.replace(answer, "_______");
+
+                // Generate distractors from other sentences in the text
+                const allWords = this.getKeywords(allText);
+                const distractors = new Set();
+                let attempts = 0;
+                
+                while(distractors.size < 3 && attempts < 50) {
+                    const w = allWords[Math.floor(Math.random() * allWords.length)];
+                    if (w.toLowerCase() !== answer.toLowerCase() && w.length > 3) {
+                        distractors.add(w);
+                    }
+                    attempts++;
+                }
+
+                // Fallback distractors if text is too short
+                if (distractors.size < 3) {
+                    ["None of the above", "All of the above", "Option C"].forEach(d => distractors.add(d));
+                }
+
+                const options = [...distractors].slice(0, 3);
+                options.push(answer);
+                
+                // Shuffle
+                options.sort(() => Math.random() - 0.5);
+
+                return {
+                    type: 'MCQ',
+                    question: question,
+                    options: options,
+                    answer: answer
+                };
+            },
+
+            // Generate True/False
+            generateTrueFalse(sentence) {
+                const isTrue = Math.random() > 0.5;
+                let statement = sentence.trim();
+
+                if (!isTrue) {
+                    // Fabricate a false statement (naive method: swap logic words or keywords)
+                    if (statement.includes(" is ")) {
+                        statement = statement.replace(" is ", " is not ");
+                    } else if (statement.includes(" can ")) {
+                        statement = statement.replace(" can ", " cannot ");
+                    } else if (statement.includes(" increase ")) {
+                        statement = statement.replace(" increase ", " decrease ");
+                    } else {
+                        // Force true if we can't safely flip
+                        return { type: 'True/False', question: statement, answer: "True" };
+                    }
+                }
+
+                return {
+                    type: 'True/False',
+                    question: statement,
+                    answer: isTrue ? "True" : "False"
+                };
+            },
+
+            // Generate Fill-in-Blanks
+            generateFillBlank(sentence) {
+                const keywords = this.getKeywords(sentence);
+                if (keywords.length === 0) return null;
+                
+                const answer = keywords[Math.floor(Math.random() * keywords.length)];
+                const question = sentence.replace(answer, "_______");
+
+                return {
+                    type: 'Fill-in-the-Blank',
+                    question: question,
+                    answer: answer
+                };
+            },
+
+            // Generate Short Answer
+            generateShort(sentence) {
+                const keywords = this.getKeywords(sentence);
+                if (keywords.length === 0) return null;
+                const topic = keywords[0];
+                
+                const starters = ["Explain the significance of", "Describe the concept of", "What is meant by", "Define"];
+                const starter = starters[Math.floor(Math.random() * starters.length)];
+
+                return {
+                    type: 'Short Answer',
+                    question: `${starter} "${topic}" based on the text?`,
+                    answer: sentence // Context as answer key
+                };
+            },
+
+             // Generate Long Answer
+             generateLong(sentence) {
+                const keywords = this.getKeywords(sentence);
+                if (keywords.length < 2) return null;
+                
+                return {
+                    type: 'Long Answer',
+                    question: `Discuss the relationship between "${keywords[0]}" and "${keywords[1]}" as described in the text.`,
+                    answer: "Open-ended based on text context."
+                };
+            },
+
+            // Main Process
+            create(text, type, count) {
+                const sentences = this.getSentences(this.clean(text));
+                const questions = [];
+                const usedSentences = new Set();
+
+                // Safety Loop
+                let attempts = 0;
+                while (questions.length < count && attempts < sentences.length * 2) {
+                    attempts++;
+                    
+                    // Pick random sentence not used recently
+                    const sentence = sentences[Math.floor(Math.random() * sentences.length)];
+                    if (!sentence || sentence.length < 20 || usedSentences.has(sentence)) continue;
+                    
+                    usedSentences.add(sentence);
+
+                    let q = null;
+                    let currentType = type;
+
+                    if (type === 'mixed') {
+                        const types = ['mcq', 'truefalse', 'fillblanks', 'short'];
+                        currentType = types[Math.floor(Math.random() * types.length)];
+                    }
+
+                    if (currentType === 'mcq') q = this.generateMCQ(sentence, text);
+                    else if (currentType === 'truefalse') q = this.generateTrueFalse(sentence);
+                    else if (currentType === 'fillblanks') q = this.generateFillBlank(sentence);
+                    else if (currentType === 'short') q = this.generateShort(sentence);
+                    else if (currentType === 'long') q = this.generateLong(sentence);
+
+                    if (q) questions.push(q);
+                }
+
+                return questions;
+            }
+        };
+
+        // --- App Logic ---
+        const app = {
+            init() {
+                this.cacheDOM();
+                this.bindEvents();
+                this.loadSavedInput();
+                this.updateCounts();
+                document.getElementById('year').textContent = new Date().getFullYear();
+                lucide.createIcons();
+            },
+
+            cacheDOM() {
+                this.dom = {
+                    input: document.getElementById('text-input'),
+                    outputArea: document.getElementById('output-area'),
+                    emptyState: document.getElementById('empty-state'),
+                    loading: document.getElementById('loading-overlay'),
+                    qType: document.getElementById('q-type'),
+                    qCountRange: document.getElementById('q-count-range'),
+                    qCountDisplay: document.getElementById('q-count-display'),
+                    inputCounts: document.getElementById('input-counts'),
+                    toast: document.getElementById('toast'),
+                    toastTitle: document.getElementById('toast-title'),
+                    toastMsg: document.getElementById('toast-msg')
+                };
+            },
+
+            bindEvents() {
+                this.dom.input.addEventListener('input', () => {
+                    this.saveInput();
+                    this.updateCounts();
+                });
+
+                this.dom.qCountRange.addEventListener('input', (e) => {
+                    this.dom.qCountDisplay.textContent = e.target.value;
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        this.generate();
+                    }
+                });
+            },
+
+            loadSavedInput() {
+                const saved = localStorage.getItem('study-suite-question-input');
+                if (saved) this.dom.input.value = saved;
+            },
+
+            saveInput() {
+                localStorage.setItem('study-suite-question-input', this.dom.input.value);
+            },
+
+            updateCounts() {
+                const text = this.dom.input.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                this.dom.inputCounts.textContent = `${words} words`;
+            },
+
+            clearInput() {
+                if (confirm("Clear source text?")) {
+                    this.dom.input.value = "";
+                    this.saveInput();
+                    this.updateCounts();
+                    this.renderOutput([]); // Clear output
+                }
+            },
+
+            generate() {
+                const text = this.dom.input.value.trim();
+                const type = this.dom.qType.value;
+                const count = parseInt(this.dom.qCountRange.value);
+
+                if (!text || text.length < 50) {
+                    this.showToast("Error", "Please enter more text to generate questions.", true);
+                    return;
+                }
+
+                this.dom.loading.classList.remove('hidden');
+
+                // Simulate processing
+                setTimeout(() => {
+                    const questions = Generator.create(text, type, count);
+                    this.renderOutput(questions);
+                    this.dom.loading.classList.add('hidden');
+                    
+                    if (questions.length > 0) {
+                        this.showToast("Success", `${questions.length} questions generated.`);
+                    } else {
+                        this.showToast("Info", "Could not generate questions. Try adding more text.", true);
+                    }
+                }, 1000);
+            },
+
+            renderOutput(questions) {
+                if (!questions || questions.length === 0) {
+                    this.dom.outputArea.innerHTML = '';
+                    this.dom.outputArea.appendChild(this.dom.emptyState);
+                    this.dom.emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                let html = '';
+                questions.forEach((q, index) => {
+                    html += `<div class="question-card bg-white border border-border rounded-xl p-6 mb-4 shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-bold text-accent bg-accent/5 px-2 py-1 rounded uppercase tracking-wide">${q.type}</span>
+                            <span class="text-xs text-muted-foreground">Q${index + 1}</span>
+                        </div>
+                        <h3 class="font-medium text-primary text-lg mb-4">${q.question}</h3>`;
+
+                    if (q.type === 'MCQ') {
+                        html += `<div class="space-y-2">`;
+                        q.options.forEach((opt, i) => {
+                            html += `<div class="option-label flex items-center gap-3 p-3 rounded-lg border border-border/50">
+                                <div class="w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs font-medium text-muted-foreground bg-secondary/50">${String.fromCharCode(65 + i)}</div>
+                                <span class="text-sm text-secondary-foreground">${opt}</span>
+                            </div>`;
+                        });
+                        html += `</div>`;
+                        html += `<div class="mt-4 pt-3 border-t border-border/50 text-xs text-green-600 font-medium hidden show-answer">Answer: ${q.answer}</div>`;
+                    } else {
+                        html += `<div class="mt-2 p-3 bg-secondary/30 rounded-lg border border-border/50">
+                            <div class="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Answer Key</div>
+                            <div class="text-sm font-medium text-primary">${q.answer}</div>
+                        </div>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                this.dom.outputArea.innerHTML = html;
+            },
+
+            copyOutput() {
+                const content = this.dom.outputArea.innerText;
+                if (!content || content.includes("Ready to create")) return;
+                
+                navigator.clipboard.writeText(content).then(() => {
+                    this.showToast("Copied", "Questions copied to clipboard.");
+                });
+            },
+
+            showToast(title, msg, isError = false) {
+                this.dom.toastTitle.textContent = title;
+                this.dom.toastMsg.textContent = msg;
+                this.dom.toast.classList.add('show');
+                
+                const icon = this.dom.toast.querySelector('i');
+                if (isError) {
+                    icon.setAttribute('data-lucide', 'alert-circle');
+                    icon.classList.replace('text-green-500', 'text-red-500');
+                } else {
+                    icon.setAttribute('data-lucide', 'check-circle');
+                    icon.classList.replace('text-red-500', 'text-green-500');
+                }
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    this.dom.toast.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
 </body>
 </html>
